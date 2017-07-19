@@ -1,0 +1,1 @@
+obj-$(CONFIG_TOUCHSCREEN_EKTF2K) += ektf2k.o

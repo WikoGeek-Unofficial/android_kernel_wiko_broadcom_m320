@@ -1,0 +1,84 @@
+/******************************************************************************/
+/*                                                                            */
+/* Copyright 2013 Broadcom Corporation                                        */
+/*                                                                            */
+/* Unless you and Broadcom execute a separate written software license        */
+/* agreement governing use of this software, this software is licensed        */
+/* to you under the terms of the GNU General Public License version 2         */
+/* (the GPL), available at                                                    */
+/*                                                                            */
+/* http://www.broadcom.com/licenses/GPLv2.php                                 */
+/*                                                                            */
+/* with the following added to such license:                                  */
+/*                                                                            */
+/* As a special exception, the copyright holders of this software give        */
+/* you permission to link this software with independent modules, and         */
+/* to copy and distribute the resulting executable under terms of your        */
+/* choice, provided that you also meet, for each linked independent           */
+/* module, the terms and conditions of the license of that module.            */
+/* An independent module is a module which is not derived from this           */
+/* software. The special exception does not apply to any modifications        */
+/* of the software.                                                           */
+/*                                                                            */
+/* Notwithstanding the above, under no circumstances may you combine          */
+/* this software in any way with any other Broadcom software provided         */
+/* under a license other than the GPL, without Broadcom's express             */
+/* prior written consent.                                                     */
+/*                                                                            */
+/******************************************************************************/
+/dts-v1/;
+#ifdef SECURE_CARVEOUT  // Allow secure variant to insert memreserve, normally do nothing.
+SECURE_CARVEOUT
+#endif
+#include "r8a7373.dtsi"
+#include "heatlte-common.dtsi"
+
+/{
+
+	model = "Broadcom,Heat-LTE 0.20-";
+};
+
+&home_button {
+	gpios = <&pfc 25 GPIO_ACTIVE_LOW>;
+};
+
+&pfc {
+	key_pins: keys {
+		renesas,pins = "PORT1", "PORT2", "PORT25";
+	};
+
+	touchkey_pins: touchkey {
+		renesas,groups = "irqc_irq29";
+		renesas,function = "irqc";
+		bias-pull-up;
+	};
+};
+
+&i2c4 {
+	touchscreen@24 {
+		compatible = "cypress,cyttsp4";
+		reg = <0x24>;
+		tname = "Cypress-Heat";
+		gpios = <&pfc 32 GPIO_ACTIVE_HIGH>,
+			<&pfc 26 GPIO_ACTIVE_HIGH>,
+			<&pfc 21 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&i2c5 {
+	/* Most boards don't use this bus, so not enabled by default */
+	status = "okay";
+
+	touchkey@20 {
+		compatible = "cypress,cypress-touchkey";
+		reg = <0x20>;
+		interrupt-parent = <&irqc0>;
+		interrupts = <29 IRQ_TYPE_EDGE_FALLING>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&touchkey_pins>;
+	};
+};
+
+&i2c7{
+        status = "disabled";
+};

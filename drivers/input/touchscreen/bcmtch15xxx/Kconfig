@@ -1,0 +1,14 @@
+#
+# BROADCOM Touchscreen driver configuration
+#
+
+config TOUCHSCREEN_BCMTCH15XXX
+	tristate "Broadcom 15xxx touchscreen interface"
+	depends on I2C
+	help
+	  Say Y here to support the BCMTCH15XXX touchscreen
+	  controller on a I2C bus
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called bcmtch15xxx.
+

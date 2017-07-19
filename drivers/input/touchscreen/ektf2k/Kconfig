@@ -1,0 +1,8 @@
+#
+# RMI4 configuration
+#
+config TOUCHSCREEN_EKTF2K
+	bool "Elan touch controller support"
+	help
+	  Say Y here if you want to support the ektf2k bus.
+	  If unsure, say Y.

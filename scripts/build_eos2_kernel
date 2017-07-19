@@ -1,0 +1,183 @@
+#!/bin/bash
+#--------------------------- COPYRIGHT INFORMATION ----------------------
+# This program contains proprietary information that is a trade secret of
+# Renesas and also is protected as an unpublished work under
+# applicable Copyright laws. Recipient is to retain this program in
+# confidence and is not permitted to use or make copies thereof other than
+# as permitted in a written agreement with Renesas.
+#
+# Copyright (C) 2013 Renesas Mobile Corporation.
+# All rights reserved.
+#---------------------------------------------------------------------------
+#
+# Script to compile kernel image
+#
+
+# Exit script if fail
+set -e
+set -o pipefail
+
+#
+# Function to print usage
+# XXX: this function must be defined before 'build_eos2_envsetup'
+#
+usage() {
+  echo ""
+  echo "Usage:"
+  echo "  `basename $0` [-b <config>] <command>"
+  echo ""
+  echo "Where:"
+  echo "  <config> is optional command line argument"
+  echo "    if = <board-name> or <board-name>-eng, build android eng build"
+  echo "    if = <board-name>-user, build android user build"
+  echo "    if = <board-name>-debug, build kernel debug build"
+  echo "    valid <board-name> = ''afyonlte'" "heatlte" "vivaltolte"
+  echo "  <command> is optional"
+  echo "   if <command> = "bootimage", make boot.img "
+  echo "   if <command> = "menuconfig", run kernel menuconfig"
+  echo "   if <command> = "xconfig", run kernel xconfig"
+  echo "   if <command> = "clean", run kernel clean"
+  echo "   if <command> = "distclean", run kernel distclean"
+  echo ""
+}
+
+# Setup build environment and select Board
+source build_rlte_setup
+
+# Local variables
+LOGF=${SCRIPTS_ROOT}/log_kernel.txt
+KERNEL_INSTALLED_BINARY=$ANDROID_ROOT/out/target/product/${RLTE_TARGET}/kernel
+KERNEL_MAKE_CMD="make $NJOBS -C $KERNEL_ROOT O=$KERNEL_OUTPUT"
+KERNEL_ZIMAGE=${KERNEL_OUTPUT}/arch/arm/boot/zImage
+KERNEL_DTB_DIR=${KERNEL_OUTPUT}/arch/arm/boot/dts
+DTB_DIR=$ANDROID_ROOT/out/target/product/${RLTE_TARGET}/dtbs
+DTB_IMG=$ANDROID_ROOT/out/target/product/${RLTE_TARGET}/dtblobs.img
+DTBPART_SIZE=1572864
+MAKE_EXT4FS=$ANDROID_ROOT/out/host/linux-x86/bin/make_ext4fs
+
+export KERNELDIR=$KERNEL_ROOT
+
+#
+# Function to build kernel
+#
+build_kernel () {
+{
+  # build kernel
+  echo "================== * Compiling kernel ... * =================="
+  $KERNEL_MAKE_CMD
+  if [ $? -ne 0 ]; then
+    echo "================== * Fail to compile kernel * =================="
+    cd $SCRIPTS_ROOT >/dev/null 2>&1
+    exit -1
+  fi
+
+  cp -p $KERNEL_ZIMAGE $KERNEL_INSTALLED_BINARY
+
+} 2>&1 | tee $LOGF
+}
+
+#
+# Build bootimage
+# NOTE: boot.img will be created only for the incremental build
+#       It needs the ramdisk.img, so first run ./build_rlte_all
+#
+build_bootimage() {
+{
+
+  MKBOOTIMG=$ANDROID_ROOT/out/host/linux-x86/bin/mkbootimg
+  BOOTIMG_RAMDISK=$ANDROID_OUT_TARGET/ramdisk.img
+  BOOTIMG_OUTPUT=$ANDROID_OUT_TARGET/boot.img
+
+  if [ -f $BOOTIMG_RAMDISK ]; then
+
+    # remove existing boot.img from out folder
+    rm -rvf $BOOTIMG_OUTPUT 2> /dev/null
+
+    # Create bootimage
+    echo "========================================================================"
+    echo " Creating boot.img ..."
+    echo "========================================================================"
+
+    BOARD_KERNEL_BASE=`grep -r CONFIG_MEMORY_START $KERNEL_OUTPUT/.config| cut -d '=' -f 2-`
+
+    # mkbootimage --ramdisk_offset option
+    RAMDISK_OFFSET=`eval echo $(grep -r ramdisk_offset $ANDROID_ROOT/device/broadcom/eos2/$RLTE_TARGET/BoardConfig.mk| cut -d '=' -f 2- | sed 's/\$(\(\w\+\))/$\1/g')`
+
+    echo "Please verify boot.img parameter"
+    echo "========================================================================"
+    echo "KERNEL_INSTALLED_BINARY=$KERNEL_INSTALLED_BINARY"
+    echo "BOARD_KERNEL_BASE=$BOARD_KERNEL_BASE"
+    echo "BOOTIMG_RAMDISK=$BOOTIMG_RAMDISK"
+    echo "RAMDISK_OFFSET=$RAMDISK_OFFSET"
+    echo "========================================================================"
+    echo -e "\n\e[0;31;47mNOTE:\e[0m RUN './build_eos2_mydroid bootimage' COMMAND IF YOU WANT TO DO IT PROPERLY!\n"
+
+    $MKBOOTIMG   --kernel $KERNEL_INSTALLED_BINARY --base $BOARD_KERNEL_BASE --ramdisk $BOOTIMG_RAMDISK $RAMDISK_OFFSET --output $BOOTIMG_OUTPUT
+
+    # check for success
+    if [ $? -eq 0 ]; then
+      echo "================== * Successfully created bootimage * =================="
+      ls -l $BOOTIMG_OUTPUT 2>&1
+      echo "========================================================================"
+    fi
+  else
+    echo "========================================================================"
+    echo "NOTE: boot.img will be created only for incremental build"
+    echo "========================================================================"
+  fi
+
+} 2>&1 | tee $KERNEL_LOG_FILE
+}
+
+build_dtb_image() {
+{
+    # we require make_ext4fs, which is available only after android compilation, so
+    # create dtblobs.img only during incremental builds
+    if [ ! -e $MAKE_EXT4FS ] ; then
+      echo "###### dtb filsystem image creation will work only for incremental build ######"
+      return
+    fi
+
+    if [ ! -d $DTB_DIR ] ; then
+      mkdir $DTB_DIR
+    fi
+    cp -p $KERNEL_DTB_DIR/r8a7373-*.dtb $DTB_DIR
+    cp -p $KERNEL_DTB_DIR/r8a73a7-*.dtb $DTB_DIR
+    rm -f $DTB_DIR/*secureos*.dtb
+    $MAKE_EXT4FS -l $DTBPART_SIZE -b 1024 $DTB_IMG $DTB_DIR
+} 2>&1 | tee $KERNEL_LOG_FILE
+}
+
+# main()
+{
+  cd $ANDROID_ROOT >/dev/null 2>&1
+
+  # Create output dir, if not exist
+  if [ ! -d $KERNEL_OUTPUT ]
+  then
+    echo "Creating Kernel Output Dir $KERNEL_OUTPUT"
+    mkdir -p $KERNEL_OUTPUT
+  fi
+
+  # select defconfig
+  echo "$KERNEL_MAKE_CMD $RLTE_DEFCONFIG"
+  $KERNEL_MAKE_CMD $RLTE_DEFCONFIG
+
+  case "$1" in
+    "xconfig"|"menuconfig"|"clean"|"distclean"|"mrproper")
+      echo "$KERNEL_MAKE_CMD $1"
+      $KERNEL_MAKE_CMD $1
+      ;;
+    "bootimage"|"bootimg")
+      build_kernel
+      build_bootimage
+      build_dtb_image
+      ;;
+    *)
+      build_kernel
+      ;;
+  esac
+
+  cd $SCRIPTS_ROOT >/dev/null 2>&1
+
+}

@@ -1,0 +1,237 @@
+/******************************************************************************/
+/*                                                                            */
+/* Copyright 2014 Broadcom Corporation                                        */
+/*                                                                            */
+/* Unless you and Broadcom execute a separate written software license        */
+/* agreement governing use of this software, this software is licensed        */
+/* to you under the terms of the GNU General Public License version 2         */
+/* (the GPL), available at                                                    */
+/*                                                                            */
+/* http://www.broadcom.com/licenses/GPLv2.php                                 */
+/*                                                                            */
+/* with the following added to such license:                                  */
+/*                                                                            */
+/* As a special exception, the copyright holders of this software give        */
+/* you permission to link this software with independent modules, and         */
+/* to copy and distribute the resulting executable under terms of your        */
+/* choice, provided that you also meet, for each linked independent           */
+/* module, the terms and conditions of the license of that module.            */
+/* An independent module is a module which is not derived from this           */
+/* software. The special exception does not apply to any modifications        */
+/* of the software.                                                           */
+/*                                                                            */
+/* Notwithstanding the above, under no circumstances may you combine          */
+/* this software in any way with any other Broadcom software provided         */
+/* under a license other than the GPL, without Broadcom's express             */
+/* prior written consent.                                                     */
+/*                                                                            */
+/******************************************************************************/
+
+#include "eos-board-common.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
+/{
+	chosen {
+		bootargs = "console=ttySC0,115200 earlyprintk=sh-sci.0,115200";
+		linux,sysrq-reset-seq {
+			keyset = <KEY_VOLUMEDOWN KEY_VOLUMEUP>;
+			timeout-ms = <3000>;
+		};
+	};
+
+	memory@40000000 {
+		device_type = "memory";
+		reg = <0x40000000 0x40000000>;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		#address-cells = <0>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_pins>;
+
+		volume-up {
+			label = "+";
+			gpios = <&pfc 1 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+		};
+
+		volume-down {
+			label = "-";
+			gpios = <&pfc 2 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_VOLUMEDOWN>;
+			gpio-key,wakeup;
+		};
+	};
+
+	bcm-bt-rfkill {
+		compatible = "bcm,bcm-bt-rfkill";
+		bcm-bt-rfkill-vreg-gpio = <&pfc 268 GPIO_ACTIVE_HIGH>;
+		bcm-bt-rfkill-n-reset-gpio = <&pfc 15 GPIO_ACTIVE_LOW>;
+	};
+
+        wlan-sdio {
+                compatible = "brcm,wlan-sdio";
+                bcm-wlan-host-wake = <&pfc 98 GPIO_ACTIVE_HIGH>;
+                bcm-wlan-reset = <&pfc 260 GPIO_ACTIVE_HIGH>;
+        };
+
+
+	sound {
+		compatible = "renesas,fsi-snd-d2153";
+		renesas,fsia = <&fsia>;
+		renesas,fsib = <&fsib>;
+		renesas,mclk-freq = <13000000>;
+		renesas,audio-routing =
+			"RECCHL", "AIFOUTL",
+			"RECCHR", "AIFOUTR",
+			"AIFINL", "VCLK4",
+			"AIFINR", "VCLK4",
+			"AIFOUTL", "VCLK4",
+			"AIFOUTR", "VCLK4",
+			"Headphone Jack Left", "Headphone Left PGA",
+			"Headphone Jack Right", "Headphone Right PGA",
+			"Speaker", "Speaker PGA",
+			"Earpiece", "Earpiece PGA";
+	};
+
+	bcm-gps {
+		compatible = "bcm,bcm-gps";
+		bcm-gps-hostwake = <&pfc 0 GPIO_ACTIVE_HIGH>;
+		bcm-gps-regpu-gpio = <&pfc 11 GPIO_ACTIVE_HIGH>;
+	};
+
+	vibrator {
+		compatible = "ss,vibrator";
+		regulator  = "vdd_motor_pmic";
+		voltage    = <2800000>;
+		gpio	   = <&pfc 23 GPIO_ACTIVE_HIGH>;
+	};
+
+	backlight {
+		compatible = "renesas,tpu-led-backlight";
+		renesas,tpu-channel = "TPU0TO3";
+		max-brightness = <255>;
+		default-brightness = <143>;
+		pinctrl-names = "default", "idle";
+		pinctrl-0 = <&backlight_pin>;
+		pinctrl-1 = <&backlight_pin_hiz>;
+	};
+
+	gpio-leds {
+		compatible = "gpio-leds";
+
+		red {
+			label = "red";
+			gpios = <&pfc 17 GPIO_ACTIVE_HIGH>;
+		};
+
+		green {
+			label = "green";
+			gpios = <&pfc 18 GPIO_ACTIVE_HIGH>;
+		};
+	};
+};
+
+&lcdc {
+	pname = "OTM9608A";
+	reset-gpio = <&pfc 22 GPIO_ACTIVE_LOW>;
+	te-irq = <&pfc 27 GPIO_ACTIVE_HIGH>;
+};
+
+&pfc {
+	hogs {
+		unused-pins {
+			renesas,groups =
+				"scifa0_clk", "scifa1_ctrl", "scifa1_clk",
+				"scifb3_data", "vio_cko5", "bsc_rd_we16",
+				"bsc_cs0", "bsc_cs2", "bsc_cs4", "bsc_wait",
+				"bsc_rdwr", "bsc_data16", "bsc_cko",
+				"bsc_addr_0_10","fsib_mclk_in", "sdhi2_data4",
+				"sdhi2_ctrl", "sdhi0_wp";
+			renesas,pins =
+				"PORT3", "PORT6", "PORT10", "PORT14",
+				"PORT17", "PORT18", "PORT24", "PORT25",
+				"PORT26", "PORT29", "PORT33", "PORT44", "PORT46",
+				"PORT47", "PORT72", "PORT73", "PORT74",
+				"PORT75", "PORT80", "PORT81", "PORT82",
+				"PORT83", "PORT86", "PORT87", "PORT88",
+				"PORT89", "PORT90", "PORT96", "PORT97",
+				"PORT102", "PORT103", "PORT104", "PORT105",
+				"PORT107", "PORT110", "PORT140", "PORT141",
+				"PORT142", "PORT198", "PORT199", "PORT275",
+				"PORT276", "PORT277", "PORT311", "PORT312";
+			bias-pull-down;
+		};
+	};
+
+	key_pins: keys {
+		renesas,pins = "PORT1", "PORT2";
+		bias-pull-up;
+	};
+
+	backlight_pin: backlight {
+		renesas,groups = "tpu0_to3";
+		renesas,function = "tpu0";
+	};
+
+	backlight_pin_hiz: backlight_hiz {
+		renesas,groups = "tpu0_to3";
+		bias-high-impedance;
+	};
+};
+
+&i2c2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	/* Proximity Sensor */
+	tmd2771: tmd2771@0x39 {
+		compatible = "bcm,tmd2771";
+		reg = <0x39>;
+		gpio-irq-pin = <108>;
+		calibrate_target_param = <300000>;
+		als_time_param = <200>;
+		scale_factor_param = <1>;
+		gain_trim_param = <512>;
+		filter_history_param = <3>;
+		filter_count_param = <1>;
+		gain_param = <2>;
+		prox_threshold_hi_param = <700>;
+		prox_threshold_lo_param = <460>;
+		als_threshold_hi_param = <1>;
+		als_threshold_lo_param = <0>;
+		prox_int_time_param = <238>;
+		prox_adc_time_param = <255>;
+		prox_wait_time_param = <238>;
+		prox_intr_filter_param = <0x41>;
+		prox_config_param = <0>;
+		prox_pulse_cnt_param = <32>;
+		prox_gain_param = <0xA2>;
+		prox_win_sw = <10>;
+	};
+
+	/* e-compass Sensor */
+	ak09911: ak09911@0c {
+		compatible = "akm,ak09911";
+		/* slave address */
+		reg = <0x0c>;
+	};
+
+	/* Accelerometer sensor */
+	lis3dh: lis3dh@0x19 {
+		compatible = "bcm,lis3dh";
+		/* slave address */
+		reg = <0x19>;
+		axis_map_x = <1>;
+		axis_map_y = <0>;
+		axis_map_z = <2>;
+		negate_x = <1>;
+		negate_y = <1>;
+		negate_z = <1>;
+	};
+
+};

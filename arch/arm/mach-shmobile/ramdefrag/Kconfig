@@ -1,0 +1,8 @@
+config SHMOBILE_RAM_DEFRAG
+	bool "SH Mobile RAM Defrag feature"
+	depends on COMPACTION
+	default n
+	help
+	  SH Mobile RAM Defrag feature
+	  Get status of RAM banks whether they are used or freed
+	  Execute RAM defragmentation for whole main memory

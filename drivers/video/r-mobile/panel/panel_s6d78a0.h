@@ -1,0 +1,356 @@
+/*
+ * drivers/video/r-mobile/panel/panel_s6d78a0.h
+ *
+ * Copyright (C) 2014 Broadcom Corporation
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+#include "panel_common.h"
+
+#define S6D78A0_HS_TRAIL_NS 60
+#define S6D78A0_HS_TRAIL_UI 4
+#define S6D78A0_HS_TRAIL_ADJUST (25*PRECISION_FACT)
+#define S6D78A0_HSPPVL_NS 40
+#define S6D78A0_HSPPVL_UI 4
+#define S6D78A0_CKTRVL_NS 60
+#define S6D78A0_CKPPVL_NS 38
+#define S6D78A0_HSZEROVL_NS 145
+#define S6D78A0_HSZEROVL_UI 10
+#define S6D78A0_CKPOSTVL_NS 60
+#define S6D78A0_CKPOSTVL_UI 52
+#define S6D78A0_CKPREVL_NS 1
+#define S6D78A0_CKPREVL_UI 8
+
+static struct screen_disp_time_param s6d78a0_time_param  = {
+	.hstrial_ns = S6D78A0_HS_TRAIL_NS,
+	.hstrial_ui = S6D78A0_HS_TRAIL_UI,
+	.hstrial_adj = S6D78A0_HS_TRAIL_ADJUST,
+	.hsppvl_ns = S6D78A0_HSPPVL_NS,
+	.hsppvl_ui = S6D78A0_HSPPVL_UI,
+	.cktrvl_ns = S6D78A0_CKTRVL_NS,
+	.ckppvl_ns = S6D78A0_CKPPVL_NS,
+	.hszerovl_ns = S6D78A0_HSZEROVL_NS,
+	.hszerovl_ui = S6D78A0_HSZEROVL_UI,
+	.ckpostvl_ns = S6D78A0_CKPOSTVL_NS,
+	.ckpostvl_ui = S6D78A0_CKPOSTVL_UI,
+	.ckprevl_ns = S6D78A0_CKPREVL_NS,
+	.ckprevl_ui = S6D78A0_CKPREVL_UI,
+};
+
+static struct dispctrl_rec s6d78a0_initialize_cmd[] __initdata = {
+	/* AUO Panel - Initializing Sequence(1) */
+
+	{DISPCTRL_WR_CMND, 0xF0},
+	{DISPCTRL_WR_DATA, 0x5A},
+	{DISPCTRL_WR_DATA, 0x5A},
+
+	{DISPCTRL_WR_CMND, 0xF1},
+	{DISPCTRL_WR_DATA, 0x5A},
+	{DISPCTRL_WR_DATA, 0x5A},
+
+	{DISPCTRL_WR_CMND, 0xB6},
+	{DISPCTRL_WR_DATA, 0x20},
+
+	{DISPCTRL_WR_CMND, 0xBC},
+	{DISPCTRL_WR_DATA, 0x01},
+
+	{DISPCTRL_WR_CMND, 0xB1},
+	{DISPCTRL_WR_DATA, 0x82},
+
+	{DISPCTRL_WR_CMND, 0xB5},
+	{DISPCTRL_WR_DATA, 0x10},
+
+	{DISPCTRL_WR_CMND, 0xD0},
+	{DISPCTRL_WR_DATA, 0xC8},
+
+	{DISPCTRL_WR_CMND, 0xF4},
+	{DISPCTRL_WR_DATA, 0x01},
+	{DISPCTRL_WR_DATA, 0x10},
+	{DISPCTRL_WR_DATA, 0x32},
+	{DISPCTRL_WR_DATA, 0x00},
+	{DISPCTRL_WR_DATA, 0x24},
+	{DISPCTRL_WR_DATA, 0x26},
+	{DISPCTRL_WR_DATA, 0x28},
+	{DISPCTRL_WR_DATA, 0x27},
+	{DISPCTRL_WR_DATA, 0x27},
+	{DISPCTRL_WR_DATA, 0x27},
+	{DISPCTRL_WR_DATA, 0x27},
+	{DISPCTRL_WR_DATA, 0x2B},
+	{DISPCTRL_WR_DATA, 0x2C},
+	{DISPCTRL_WR_DATA, 0x65},
+	{DISPCTRL_WR_DATA, 0x6A},
+	{DISPCTRL_WR_DATA, 0x34},
+	{DISPCTRL_WR_DATA, 0x60},
+
+	{DISPCTRL_WR_CMND, 0xEF},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x80},
+	{DISPCTRL_WR_DATA, 0x21},
+	{DISPCTRL_WR_DATA, 0x00},
+	{DISPCTRL_WR_DATA, 0x21},
+	{DISPCTRL_WR_DATA, 0x0B},
+	{DISPCTRL_WR_DATA, 0x00},
+	{DISPCTRL_WR_DATA, 0x22},
+	{DISPCTRL_WR_DATA, 0x22},
+	{DISPCTRL_WR_DATA, 0x48},
+	{DISPCTRL_WR_DATA, 0x01},
+	{DISPCTRL_WR_DATA, 0x10},
+	{DISPCTRL_WR_DATA, 0x21},
+	{DISPCTRL_WR_DATA, 0x29},
+	{DISPCTRL_WR_DATA, 0x03},
+	{DISPCTRL_WR_DATA, 0x03},
+	{DISPCTRL_WR_DATA, 0x40},
+	{DISPCTRL_WR_DATA, 0x00},
+	{DISPCTRL_WR_DATA, 0x10},
+
+	{DISPCTRL_WR_CMND, 0xF2},
+	{DISPCTRL_WR_DATA, 0x11},
+	{DISPCTRL_WR_DATA, 0x04},
+	{DISPCTRL_WR_DATA, 0x00},
+	{DISPCTRL_WR_DATA, 0x10},
+	{DISPCTRL_WR_DATA, 0x10},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x10},
+
+	{DISPCTRL_WR_CMND, 0xE1},
+	{DISPCTRL_WR_DATA, 0x01},
+	{DISPCTRL_WR_DATA, 0x00},
+	{DISPCTRL_WR_DATA, 0x01},
+	{DISPCTRL_WR_DATA, 0x1B},
+	{DISPCTRL_WR_DATA, 0x20},
+	{DISPCTRL_WR_DATA, 0x17},
+
+	{DISPCTRL_WR_CMND, 0xE2},
+	{DISPCTRL_WR_DATA, 0xED},
+	{DISPCTRL_WR_DATA, 0xC7},
+	{DISPCTRL_WR_DATA, 0x23},
+
+	/* AUO Panel - Initializing Sequence(2) */
+	{DISPCTRL_WR_CMND, 0xF6},
+	{DISPCTRL_WR_DATA, 0x63},
+	{DISPCTRL_WR_DATA, 0x23},
+	{DISPCTRL_WR_DATA, 0x11},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x10},
+
+	{DISPCTRL_WR_CMND, 0xF7},
+	{DISPCTRL_WR_DATA, 0x1F},
+	{DISPCTRL_WR_DATA, 0x1F},
+	{DISPCTRL_WR_DATA, 0x05},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x1B},
+	{DISPCTRL_WR_DATA, 0x1B},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x0B},
+	{DISPCTRL_WR_DATA, 0x0A},
+	{DISPCTRL_WR_DATA, 0x11},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x1F},
+	{DISPCTRL_WR_DATA, 0x1F},
+	{DISPCTRL_WR_DATA, 0x04},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x1B},
+	{DISPCTRL_WR_DATA, 0x1B},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x09},
+	{DISPCTRL_WR_DATA, 0x08},
+	{DISPCTRL_WR_DATA, 0x10},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+	{DISPCTRL_WR_DATA, 0x02},
+
+	/* AUO Panel - Gamma Setting Sequence */
+	{DISPCTRL_WR_CMND, 0xFA},
+	{DISPCTRL_WR_DATA, 0x18},
+	{DISPCTRL_WR_DATA, 0x30},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x23},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x1C},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x17},
+	{DISPCTRL_WR_DATA, 0x19},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x1C},
+	{DISPCTRL_WR_DATA, 0x18},
+	{DISPCTRL_WR_DATA, 0x3D},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x23},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x1C},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x17},
+	{DISPCTRL_WR_DATA, 0x19},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x1C},
+	{DISPCTRL_WR_DATA, 0x18},
+	{DISPCTRL_WR_DATA, 0x3D},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x23},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x1C},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x17},
+	{DISPCTRL_WR_DATA, 0x19},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x1C},
+
+	{DISPCTRL_WR_CMND, 0xFB},
+	{DISPCTRL_WR_DATA, 0x18},
+	{DISPCTRL_WR_DATA, 0x30},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x23},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x1C},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x17},
+	{DISPCTRL_WR_DATA, 0x19},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x1C},
+	{DISPCTRL_WR_DATA, 0x18},
+	{DISPCTRL_WR_DATA, 0x3D},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x23},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x1C},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x17},
+	{DISPCTRL_WR_DATA, 0x19},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x1C},
+	{DISPCTRL_WR_DATA, 0x18},
+	{DISPCTRL_WR_DATA, 0x3D},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x2A},
+	{DISPCTRL_WR_DATA, 0x23},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x1C},
+	{DISPCTRL_WR_DATA, 0x1A},
+	{DISPCTRL_WR_DATA, 0x17},
+	{DISPCTRL_WR_DATA, 0x19},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x12},
+	{DISPCTRL_WR_DATA, 0x1C},
+
+	/* AUO Panel - Display on */
+	{DISPCTRL_WR_CMND, 0x36},
+	{DISPCTRL_WR_DATA, 0x18},
+
+	{DISPCTRL_WR_CMND, 0x35},
+	{DISPCTRL_WR_DATA, 0x00},
+
+	/* AUO Panel - Sleep Out */
+	{DISPCTRL_WR_CMND, 0x11},
+	{DISPCTRL_SLEEP_MS, 120},
+	{DISPCTRL_DRAW_BLACK, 0},
+
+	{DISPCTRL_WR_CMND, 0x29},
+	{DISPCTRL_SLEEP_MS, 10},
+	{DISPCTRL_DRAW_BLACK, 0},
+
+	/* AUO Panel - CABC_PWM */
+	{DISPCTRL_WR_CMND, 0x51},
+	{DISPCTRL_WR_DATA, 0xff},
+
+	{DISPCTRL_WR_CMND, 0x53},
+	{DISPCTRL_WR_DATA, 0x24},
+
+	{DISPCTRL_WR_CMND, 0x55},
+	{DISPCTRL_WR_DATA, 0x01},
+	{DISPCTRL_SLEEP_MS, 5},
+	{DISPCTRL_LIST_END, 0},
+};
+
+
+static struct dispctrl_rec s6d78a0_initialize_cmd_1[] __initdata = {
+	{DISPCTRL_DRAW_BLACK, 0},
+	{DISPCTRL_LIST_END, 0},
+};
+
+static struct dispctrl_rec s6d78a0_suspend_cmd[] __initdata = {
+	{DISPCTRL_WR_CMND, 0x28},
+	{DISPCTRL_SLEEP_MS, 150},
+	{DISPCTRL_WR_CMND, 0x10},
+	{DISPCTRL_SLEEP_MS, 150},
+	{DISPCTRL_LIST_END, 0}
+};
+
+
+static struct dispctrl_rec s6d78a0_panel_id_seq[] __initdata = {
+	{DISPCTRL_WR_CMND, RDID1},
+	{DISPCTRL_WR_DATA, 0x53},
+	{DISPCTRL_WR_CMND, RDID2},
+	{DISPCTRL_WR_DATA, 0x4c},
+	{DISPCTRL_WR_CMND, RDID3},
+	{DISPCTRL_WR_DATA, 0x10},
+	{DISPCTRL_LIST_END, 0},
+};
+
+struct lcd_config s6d78a0_config __initdata = {
+	.name = "S6D78A0",
+	.modes_supp = LCD_VID_ONLY,
+	.pack_send_mode = RT_DISPLAY_SEND_MODE_HS,
+	.max_lanes = 3,
+	.phy_width = 54,
+	.phy_height = 95,
+	.width = 540,
+	.height = 960,
+	.hbp = 64,
+	.hfp = 64,
+	.hsync = 8,
+	.vbp = 5,
+	.vfp = 9,
+	.vsync = 2,
+	.setup = 2000,
+	.pulse = 2000,
+	.init_seq_vid = s6d78a0_initialize_cmd,
+	.init_seq_min = s6d78a0_initialize_cmd_1,
+	.suspend_seq = s6d78a0_suspend_cmd,
+	.panel_id = s6d78a0_panel_id_seq,
+	.verify_id = false,
+	.color_mode = RGB888,
+	.vburst_mode = LCD_VID_NON_BURST_SYNC_EVENT,
+	.max_hs_bps = 500 * 1000000,
+	.cont_clock = 0,
+	.cmd_transmission = 1,
+	.time_param = &s6d78a0_time_param,
+};

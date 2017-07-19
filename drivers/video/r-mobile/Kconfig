@@ -1,0 +1,51 @@
+config FB_SH_MOBILE_LCDC
+        tristate "SuperH Mobile LCDC framebuffer support"
+        depends on FB && (SUPERH || ARCH_SHMOBILE) && HAVE_CLK
+        select FB_SYS_FILLRECT
+        select FB_SYS_COPYAREA
+        select FB_SYS_IMAGEBLIT
+        select FB_SYS_FOPS
+        select FB_DEFERRED_IO
+        select FB_BACKLIGHT
+        select SH_MIPI_DSI if SH_LCD_MIPI_DSI
+        ---help---
+          Frame buffer driver for the on-chip SH-Mobile LCD controller.
+
+config FB_LCD_ESD
+        boolean "LCD ESD RECOVERY by interrupt"
+
+config LCD_ESD_RECOVERY_BY_CHECK_REG
+        boolean "LCD ESD RECOVERY by checking register"
+
+choice
+        depends on FB_SH_MOBILE_LCDC
+        prompt "hdmi select"
+        default FB_R_MOBILE_HDMI_KOTA
+        help
+          Selected hdmi
+
+config FB_R_MOBILE_HDMI_KOTA
+        boolean "KOTA HDMI"
+
+endchoice
+
+config FB_SH_MOBILE_DOUBLE_BUF
+        bool "SuperH Mobile double buffer support"
+        depends on FB_SH_MOBILE_LCDC
+        default y
+        help
+          SuperH Mobile LCDC framebuffer support double buffer.
+
+config FB_SH_MOBILE_RGB888
+        bool "SuperH Mobile RGB888 support"
+        depends on FB_SH_MOBILE_LCDC
+        default n
+        help
+          SuperH Mobile LCDC framebuffer support RGB888.
+
+config LDI_MDNIE
+	bool "mobile Digital Natural Image engine"
+	help
+	  This feature is used to control the display sharpness, backlight control
+	  as per the contents to be displayed
+	  This also provides support for CABC feature

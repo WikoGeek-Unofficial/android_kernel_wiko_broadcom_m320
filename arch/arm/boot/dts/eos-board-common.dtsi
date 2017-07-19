@@ -1,0 +1,361 @@
+/******************************************************************************/
+/*                                                                            */
+/* Copyright 2014 Broadcom Corporation                                        */
+/*                                                                            */
+/* Unless you and Broadcom execute a separate written software license        */
+/* agreement governing use of this software, this software is licensed        */
+/* to you under the terms of the GNU General Public License version 2         */
+/* (the GPL), available at                                                    */
+/*                                                                            */
+/* http://www.broadcom.com/licenses/GPLv2.php                                 */
+/*                                                                            */
+/* with the following added to such license:                                  */
+/*                                                                            */
+/* As a special exception, the copyright holders of this software give        */
+/* you permission to link this software with independent modules, and         */
+/* to copy and distribute the resulting executable under terms of your        */
+/* choice, provided that you also meet, for each linked independent           */
+/* module, the terms and conditions of the license of that module.            */
+/* An independent module is a module which is not derived from this           */
+/* software. The special exception does not apply to any modifications        */
+/* of the software.                                                           */
+/*                                                                            */
+/* Notwithstanding the above, under no circumstances may you combine          */
+/* this software in any way with any other Broadcom software provided         */
+/* under a license other than the GPL, without Broadcom's express             */
+/* prior written consent.                                                     */
+/*                                                                            */
+/******************************************************************************/
+
+/*
+ * Shared Device Tree for EOS SoC based boards
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+/{
+	rt: rtboot {
+		compatible = "renesas,rtboot-r8a7373", "renesas,rt-boot";
+
+		screen0 {
+			renesas,height = <960>;
+			renesas,width = <540>;
+			renesas,stride = <544>;
+			renesas,mode = <1>; /* command mode */
+		};
+
+		screen1 {
+			renesas,height = <0>;
+			renesas,width = <0>;
+			renesas,stride = <0>;
+			renesas,mode = <0>;
+		};
+	};
+
+	rt2: rtboot2 {
+		compatible = "renesas,rtboot-r8a7373", "renesas,rt-boot";
+
+		screen0 {
+			renesas,height = <960>;
+			renesas,width = <540>;
+			renesas,stride = <544>;
+			renesas,mode = <1>; /* command mode */
+		};
+
+		screen1 {
+			renesas,height = <0>;
+			renesas,width = <0>;
+			renesas,stride = <0>;
+			renesas,mode = <0>;
+		};
+	};
+/*custom_t peter  add lcd3 */	
+	rt3: rtboot3 {
+		compatible = "renesas,rtboot-r8a7373", "renesas,rt-boot";
+
+		screen0 {
+			renesas,height = <960>;
+			renesas,width = <540>;
+			renesas,stride = <544>;
+			renesas,mode = <1>; /* command mode */
+		};
+
+		screen1 {
+			renesas,height = <0>;
+			renesas,width = <0>;
+			renesas,stride = <0>;
+			renesas,mode = <0>;
+		};
+	};
+};
+
+&pfc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&hog_pins>;
+	hog_pins: hogs {
+		/* Boards can add more pin hog sub-nodes */
+		headphone_detect {
+			renesas,pins = "PORT7";
+			bias-disable;
+		};
+	};
+	cko3_pins: cko3 {
+		renesas,groups = "vio_cko3";
+		renesas,function = "vio_cko3";
+		bias-disable;
+	};
+	cko3_pins_hiz: cko3_hiz {
+		renesas,groups = "vio_cko3";
+		bias-high-impedance;
+	};
+	i2c4_pins: i2c4 {
+		renesas,groups = "i2c0h";
+		renesas,function = "i2c0h";
+		bias-disable;
+	};
+	i2c4_pins_hiz: i2c4_hiz {
+		renesas,groups = "i2c0h";
+		bias-high-impedance;
+	};
+	i2c5_pins: i2c5 {
+		renesas,groups = "i2c1h";
+		renesas,function = "i2c1h";
+		bias-disable;
+	};
+	i2c5_pins_hiz: i2c5_hiz {
+		renesas,groups = "i2c1h";
+		bias-high-impedance;
+	};
+	i2c6_pins: i2c6 {
+		renesas,groups = "i2c2h";
+		renesas,function = "i2c2h";
+		bias-disable;
+	};
+	i2c6_pins_hiz: i2c6_hiz {
+		renesas,groups = "i2c2h";
+		bias-high-impedance;
+	};
+	i2c7_pins: i2c7 {
+		renesas,groups = "i2c3h";
+		renesas,function = "i2c3h";
+		bias-disable;
+	};
+	i2c7_pins_hiz: i2c7_hiz {
+		renesas,groups = "i2c3h";
+		bias-high-impedance;
+	};
+	sdhi0_pins: sdhi0 {
+		mux {
+			renesas,groups = "sdhi0_data4", "sdhi0_ctrl", "sdhi0_cd";
+			renesas,function = "sdhi0";
+		};
+		data_cfg {
+			renesas,groups = "sdhi0_data4";
+			bias-pull-up;
+		};
+		cd_cfg {
+			renesas,groups = "sdhi0_cd";
+			bias-disable;
+			input-debounce = <1000>;
+		};
+	};
+	sdhi1_pins: sdhi1 {
+		mux {
+			renesas,groups = "sdhi1_data4", "sdhi1_ctrl";
+			renesas,function = "sdhi1";
+		};
+		cfg {
+			renesas,groups = "sdhi1_data4";
+			renesas,pins = "PORT293"; /* CMD */
+			bias-pull-up;
+		};
+
+	};
+	stm_sdhi0_pins: stm_sdhi0 {
+		mux {
+			renesas,groups = "stm_data4", "stm_ctrl";
+			renesas,function = "stm";
+		};
+		cfg {
+			renesas,pins = "PORT324"; /*SIDI */
+			bias-pull-up;
+		};
+	};
+	stm_sdhi1_pins: stm_sdhi1 {
+		mux {
+			renesas,groups = "stm_data4_b", "stm_ctrl_b";
+			renesas,function = "stm";
+		};
+		cfg {
+			renesas,pins = "PORT293"; /*SIDI */
+			bias-pull-up;
+		};
+	};
+	mmc0_pins: mmc0 {
+		mux {
+			renesas,groups = "mmc0_data8", "mmc0_ctrl";
+			renesas,function = "mmc0";
+		};
+	};
+	mmcrst_pin: mmcrst {
+		renesas,groups = "mmc_reset";
+		renesas,function = "mmc0";
+	};
+	fsia_pins: fsia {
+		mux {
+			renesas,groups = "fsia_data_in", "fsia_data_out",
+					 "fsia_sclk_out";
+			renesas,function = "fsia";
+		};
+		cfg {
+			renesas,groups = "fsia_data_out", "fsia_sclk_out";
+			bias_disable;
+		};
+	};
+	fsib_pins: fsib {
+		renesas,groups = "fsib_data_in", "fsib_data_out",
+				 "fsib_sclk_out";
+		renesas,function = "fsib";
+	};
+	ulpi_pins: ulpi {
+		mux {
+			renesas,groups = "ulpi_data8", "ulpi_ctrl";
+			renesas,function = "ulpi";
+		};
+		clk_cfg {
+			renesas,pins = "PORT211";
+			bias-disable;
+		};
+		stp_cfg {
+			renesas,pins = "PORT212";
+			bias-pull-up;
+		};
+		dir_nxt_cfg {
+			renesas,pins = "PORT213", "PORT214";
+			bias-pull-down;
+		};
+	};
+	ulpi_pins_hiz: ulpi_hiz {
+		renesas,groups = "ulpi_data8", "ulpi_ctrl";
+		bias-high-impedance;
+	};
+};
+
+/* Used for PMIC - dedicated pins */
+&i2c0 {
+	status = "okay";
+};
+
+/* Used for cameras - dedicated pins */
+&i2c1 {
+	status = "okay";
+};
+
+/* Used for sensors - dedicated pins */
+&i2c2 {
+	status = "okay";
+};
+
+/* Used for USB/UART switch - dedicated pins */
+&i2c3 {
+	status = "okay";
+};
+
+/* Used for touchscreen */
+&i2c4 {
+	pinctrl-names = "default", "idle";
+	pinctrl-0 = <&i2c4_pins>;
+	pinctrl-1 = <&i2c4_pins_hiz>;
+	status = "okay";
+};
+
+/* Used for touchkeys on some boards */
+&i2c5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c5_pins>;
+};
+
+/* Not normally used */
+&i2c6 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c6_pins>;
+};
+
+/* Used for NFC */
+&i2c7 {
+	pinctrl-names = "default", "idle";
+	pinctrl-0 = <&i2c7_pins>;
+	pinctrl-1 = <&i2c7_pins_hiz>;
+	status = "okay";
+};
+
+/* Physical Micro-SD card slot */
+&sdhi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdhi0_pins>;
+	renesas,dma-en-val = <0>;
+	renesas,dma-alignment = <0>;
+	renesas,dma-min-size = <0>;
+	renesas,detect-irq = <2050>;
+	renesas,detect-msec = <0>;
+	renesas,card-stat-sysfs;
+	renesas,sdhi-wp-disable;
+	renesas,sdhi-sdclk-offen;
+	renesas,sdhi-sdclk-div1;
+	renesas,sdhi-dma-slave-config;
+	status = "okay";
+};
+
+/* Internal SDIO interface to WLAN */
+&sdhi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdhi1_pins>;
+	bus-width = <4>;
+	cap-sdio-irq;
+	non-removable;
+	cap-power-off-card;
+	keep-power-in-suspend;
+	renesas,pm-ignore-pm-notify;
+	voltage-ranges = <1650 1950
+			  3300 3300>;
+	renesas,suspend-pwr-ctrl;
+	renesas,sdhi-sdclk-offen;
+	renesas,timeout = <1000>;
+	renesas,dump_timeout;
+	status = "okay";
+};
+
+/*
+ * STM interface - normally disabled; can be enabled in place of
+ * SDHI0 or SDHI1 (pins are shared). Board files will do so based
+ * on "stm" kernel parameter.
+ */
+&stm {
+	pinctrl-0 = <&stm_sdhi0_pins>;
+	pinctrl-1 = <&stm_sdhi1_pins>;
+};
+
+&mmcif {
+	pinctrl-0 = <&mmc0_pins &mmcrst_pin>;
+	bus-width = <8>;
+	status = "okay";
+};
+
+&usb {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&ulpi_pins &cko3_pins>;
+	pinctrl-1 = <&ulpi_pins_hiz &cko3_pins_hiz>;
+	cs-gpios = <&pfc 130 GPIO_ACTIVE_HIGH>;
+	rst-gpios = <&pfc 131 GPIO_ACTIVE_LOW>;
+	dr_mode = "peripheral";
+	status = "okay";
+};
+
+&fsia {
+	pinctrl-names = "default";
+	pinctrl-0 = <&fsia_pins>;
+};
+
+&fsib {
+	pinctrl-names = "default";
+	pinctrl-0 = <&fsib_pins>;
+};

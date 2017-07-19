@@ -1,0 +1,11 @@
+override KERNELDIR := /android/kernel
+override KERNEL_COMPONENTS := srvkm dc_shmobilefb_linux
+override KERNEL_CROSS_COMPILE := /android/prebuilts/gcc/linux-x86/arm/arm-eabi-4.7/bin/arm-eabi-
+override PVR_SYSTEM := r8a73734
+override BUILD := release
+override DEBUGLINK := 1
+override OPTIM := -O2
+override SUPPORT_ION := 1
+override SUPPORT_ANDROID_RMOBILE_NV12 := 1
+override SUPPORT_PVRSRV_DEVICE_CLASS := 1
+override PVR_ANDROID_NATIVE_WINDOW_HAS_SYNC := 1

@@ -1,0 +1,28 @@
+menuconfig ION
+	tristate "Ion Memory Manager"
+	depends on ARM
+	select GENERIC_ALLOCATOR
+	select DMA_SHARED_BUFFER
+	help
+	  Chose this option to enable the ION Memory Manager.
+
+config ION_TEGRA
+	tristate "Ion for Tegra"
+	depends on ARCH_TEGRA && ION
+	help
+	  Choose this option if you wish to use ion on an nVidia Tegra.
+
+config ION_R_MOBILE
+        tristate "Ion for R-Mobile"
+        depends on ARCH_SHMOBILE && ION
+        select ARM_HAS_SG_CHAIN
+        help
+          Choose this option if you wish to use ion on Renesas R-Mobile.
+
+config ION_R_MOBILE_USE_BOOTLOADER_AREA
+	bool "Use bootloader area as ION carveout heap"
+	depends on ION_R_MOBILE
+	default n
+	help
+	  Choose this option if you wish to re-use the bootloader area
+	  reserved(removed) from linux as a ION carveout heap.

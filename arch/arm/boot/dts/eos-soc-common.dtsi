@@ -1,0 +1,496 @@
+/*
+ * Device Tree Source Include for U2/U2B common components
+ *
+ * Copyright (C) 2014 Broadcom
+ *
+ * This file is licensed under the terms of the GNU General Public License
+ * version 2.  This program is licensed "as is" without any warranty of any
+ * kind, whether express or implied.
+ */
+
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
+/{
+	interrupt-parent = <&gic>;
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	aliases {
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		i2c2 = &i2c2;
+		i2c3 = &i2c3;
+		i2c4 = &i2c4;
+		i2c5 = &i2c5;
+		i2c6 = &i2c6;
+		i2c7 = &i2c7;
+		rtc1 = &cmt17;
+	};
+
+	/* External IRQs 0-31 */
+	irqc0: interrupt-controller@e61c0000 {
+		compatible = "renesas,irqc";
+		#interrupt-cells = <2>;
+		interrupt-controller;
+		reg = <0xe61c0000 0x200>;
+		interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 1 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 7 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 8 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 9 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 10 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 14 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 15 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 16 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 17 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 18 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 20 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 21 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 22 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 23 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 24 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 25 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 27 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 28 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 29 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	/* External IRQs 32-63 */
+	irqc1: interrupt-controller@e61c0200 {
+		compatible = "renesas,irqc";
+		#interrupt-cells = <2>;
+		interrupt-controller;
+		reg = <0xe61c0200 0x200>;
+		interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 34 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 35 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 36 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 37 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 38 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 39 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 40 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 41 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 42 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 43 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 50 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 51 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 52 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 53 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 54 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 55 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 56 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 58 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 60 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 62 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 63 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	/* From RT domain */
+	irqc10: interrupt-controller@e61c1400 {
+		compatible = "renesas,irqc";
+		#interrupt-cells = <2>;
+		interrupt-controller;
+		reg = <0xe61c1400 0x200>;
+		interrupts = <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	/* From modem */
+	irqc12: interrupt-controller@e61c1800 {
+		compatible = "renesas,irqc";
+		#interrupt-cells = <2>;
+		interrupt-controller;
+		reg = <0xe61c1800 0x200>;
+		interrupts = <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 65 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	i2c0: i2c@e6820000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "renesas,rmobile-iic";
+		reg = <0xe6820000 0x425>;
+		interrupts = <GIC_SPI 184 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <400000>;
+		renesas,transfer-timeout-ms = <500>;
+		renesas,clks-per-count = <2>;
+		status = "disabled";
+	};
+
+	i2c1: i2c@e6822000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "renesas,rmobile-iic";
+		reg = <0xe6822000 0x425>;
+		interrupts = <GIC_SPI 185 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <400000>;
+		renesas,clks-per-count = <2>;
+		status = "disabled";
+	};
+
+	i2c2: i2c@e6824000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "renesas,rmobile-iic";
+		reg = <0xe6824000 0x425>;
+		interrupts = <GIC_SPI 186 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <400000>;
+		renesas,clks-per-count = <2>;
+		status = "disabled";
+	};
+
+	i2c3: i2c@e6826000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "renesas,rmobile-iic";
+		reg = <0xe6826000 0x425>;
+		interrupts = <GIC_SPI 187 IRQ_TYPE_LEVEL_HIGH>;
+		/* custom_t:CJ this is BRCM patch, dont change it to 400000 */
+		clock-frequency = <100000>;
+		renesas,clks-per-count = <2>;
+		status = "disabled";
+	};
+
+	i2c4: i2c@e6828000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "renesas,rmobile-iic";
+		reg = <0xe6828000 0x425>;
+		interrupts = <GIC_SPI 188 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <400000>;
+		renesas,clks-per-count = <2>;
+		status = "disabled";
+	};
+
+	i2c5: i2c@e682a000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "renesas,rmobile-iic";
+		reg = <0xe682a000 0x425>;
+		interrupts = <GIC_SPI 189 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <400000>;
+		renesas,clks-per-count = <2>;
+		status = "disabled";
+	};
+
+	i2c6: i2c@e682c000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "renesas,rmobile-iic";
+		reg = <0xe682c000 0x425>;
+		interrupts = <GIC_SPI 128 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <400000>;
+		renesas,clks-per-count = <2>;
+		status = "disabled";
+	};
+
+	i2c7: i2c@e682e000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "renesas,rmobile-iic";
+		reg = <0xe682e000 0x425>;
+		interrupts = <GIC_SPI 181 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <400000>;
+		renesas,clks-per-count = <2>;
+		status = "disabled";
+	};
+
+	pfc: pfc@e6050000 {
+		compatible = "renesas,pfc-r8a7373";
+		reg = <0xe6050000 0x9000>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	mmcif: mmcif@e6bd0000 {
+		compatible = "renesas,renesas-mmcif";
+		reg = <0xe6bd0000 0x100>;
+		interrupts = <GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>;
+		max-frequency = <52000000>;
+		non-removable;
+		cap-mmc-highspeed;
+		renesas,sup-pclk = <0>;
+		renesas,dma-min-size = <0>;
+		renesas,buf-acc = <0>;
+		renesas,data-delay-ps = <0>;
+		status = "disabled";
+	};
+
+	sdhi0: sdhi@ee100000 {
+		compatible = "renesas,sdhi-r8a7373";
+		reg = <0xee100000 0x100>;
+		interrupts = <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>;
+		status = "disabled";
+	};
+
+	sdhi1: sdhi@ee120000 {
+		compatible = "renesas,sdhi-r8a7373";
+		reg = <0xee120000 0x100>;
+		interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
+		status = "disabled";
+	};
+
+	sdhi2: sdhi@ee140000 {
+		compatible = "renesas,sdhi-r8a7373";
+		reg = <0xee140000 0x100>;
+		interrupts = <GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH>;
+		status = "disabled";
+	};
+
+	fsia: sh_fsi@ec230000 {
+		compatible = "renesas,sh_fsi";
+		id = <0>;
+		reg = <0xec230000 0x500>;
+		interrupts = <GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>;
+		fsia = "fsi_out_slavemode", "fsi_in_slavemode", "slave-bit-clock-inverted", "sh_fsi_ofmt(i2s)", "sh_fsi_ifmt(i2s)";
+	};
+
+	fsib: sh_fsi2@ec230000 {
+		compatible = "renesas,sh_fsi2";
+		id = <1>;
+		reg = <0xec230000 0x500>;
+		interrupts = <GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>;
+		always_slave;
+		fsib = "master-lr-clock-inverted", "master-bit-clock-inverted", "sh_fsi_ofmt(i2s)", "sh_fsi_ifmt(i2s)";
+	};
+
+	stm: stm@e6f89000 {
+		compatible = "arm,coresight-stm";
+		reg = <0xe6f89000 0x1000>,
+		      <0xe9000000 0x1000000>,
+		      <0xe6f8b000 0x1000>;
+		reg-names = "stm-base", "stm-data-base", "funnel-base";
+		status = "disabled";
+		ztr-clk-rate = <312000000>;
+	};
+
+	usb: usb@e6890000 {
+		compatible = "renesas,usb-r8a7373",
+			"renesas,r8a66597-usb";
+		reg = <0xe6890000 0x14c>,
+			<0xe68a0000 0x64>;
+		reg-names = "USBHS", "USBHS-DMA";
+		interrupts = <GIC_SPI 87 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
+		id_irq = <&pfc 14 GPIO_ACTIVE_HIGH>;
+		on_chip = <1>;
+		buswait = <5>;
+		max_bufnum = <0xff>;
+		dmac = <1>;
+		status = "disabled";
+	};
+
+	thermal: thermal@e61f0000 {
+		compatible = "renesas,rcar-thermal";
+		reg = <0xe61f0000 0x14>,
+		      <0xe61f0100 0x38>,
+		      <0xe61f0200 0x38>;
+		interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	cmt10: timer@e6130000 {
+		compatible = "renesas,cmt-r8a7373";
+		reg = <0xe6130000 0x100>,
+		      <0xe6131000 0x4>;
+		reg-names = "cmt-base", "cmclke";
+		interrupts = <GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>;
+		renesas,clk-enable-bit = <0>;
+	};
+
+	cmt11: timer@e6130100 {
+		compatible = "renesas,cmt-r8a7373";
+		reg = <0xe6130100 0x100>,
+		      <0xe6131000 0x4>;
+		reg-names = "cmt-base", "cmclke";
+		interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
+		renesas,clk-enable-bit = <1>;
+	};
+
+	cmt12: timer@e6130200 {
+		compatible = "renesas,cmt-r8a7373";
+		reg = <0xe6130200 0x100>,
+		      <0xe6131000 0x4>;
+		reg-names = "cmt-base", "cmclke";
+		interrupts = <GIC_SPI 95 IRQ_TYPE_LEVEL_HIGH>;
+		renesas,clk-enable-bit = <2>;
+	};
+
+	cmt13: timer@e6130300 {
+		compatible = "renesas,cmt-r8a7373";
+		reg = <0xe6130300 0x100>,
+		      <0xe6131000 0x4>;
+		reg-names = "cmt-base", "cmclke";
+		interrupts = <GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>;
+		renesas,clk-enable-bit = <3>;
+	};
+
+	cmt14: timer@e6130400 {
+		compatible = "renesas,cmt-r8a7373";
+		reg = <0xe6130400 0x100>,
+		      <0xe6131000 0x4>;
+		reg-names = "cmt-base", "cmclke";
+		interrupts = <GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>;
+		renesas,clk-enable-bit = <4>;
+	};
+
+	cmt15: timer@e6130500 {
+		compatible = "renesas,cmt-r8a7373";
+		reg = <0xe6130500 0x100>,
+		      <0xe6131000 0x4>;
+		reg-names = "cmt-base", "cmclke";
+		interrupts = <GIC_SPI 98 IRQ_TYPE_LEVEL_HIGH>;
+		renesas,clk-enable-bit = <5>;
+	};
+
+	cmt16: timer@e6130600 {
+		compatible = "renesas,cmt-r8a7373";
+		reg = <0xe6130600 0x100>,
+		      <0xe6131000 0x4>;
+		reg-names = "cmt-base", "cmclke";
+		interrupts = <GIC_SPI 99 IRQ_TYPE_LEVEL_HIGH>;
+		renesas,clk-enable-bit = <6>;
+	};
+
+	cmt17: timer@e6130700 {
+		compatible = "renesas,cmt-r8a7373";
+		reg = <0xe6130700 0x100>,
+		      <0xe6131000 0x4>;
+		reg-names = "cmt-base", "cmclke";
+		interrupts = <GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>;
+		renesas,clk-enable-bit = <7>;
+	};
+
+	lcdc: lcdc@fe940000 {
+		compatible = "renesas,lcdc-r8a7373", "renesas,lcdc-shmobile";
+		reg = <0xfe940000 0x4000>,
+			<0xe61c2000 0x40>,
+			<0xbb8 0>;
+		reg-names = "lcdc0", "irq_generator", "rt_irq";
+		/* LCDC_CLK_BUS:0 LCDC_CLK_PERIPHERAL:1 LCDC_CLK_EXTERNAL:2 */
+		renesas,clock-source = <0 1 2>;
+		renesas,col-fmt-bpp = <32>;
+		renesas,desense-offset= <0>;
+		/* LCDC_CHAN_DISABLED:0 LCDC_CHAN_MAINLCD:1 LCDC_CHAN_SUBLCD:2 */
+		renesas,channel = <0 1 2>;
+		regulators = "vlcd_3v", "vlcd_1v8";
+		rt-boot = <&rt>;
+	};
+
+	lcdc2: lcdc2@fe940000 {
+		compatible = "renesas,lcdc-r8a7373", "renesas,lcdc-shmobile";
+		reg = <0xfe940000 0x4000>,
+			<0xe61c2000 0x40>,
+			<0xbb8 0>;
+		reg-names = "lcdc0", "irq_generator", "rt_irq";
+		/* LCDC_CLK_BUS:0 LCDC_CLK_PERIPHERAL:1 LCDC_CLK_EXTERNAL:2 */
+		renesas,clock-source = <0 1 2>;
+		renesas,col-fmt-bpp = <32>;
+		renesas,desense-offset= <0>;
+		/* LCDC_CHAN_DISABLED:0 LCDC_CHAN_MAINLCD:1 LCDC_CHAN_SUBLCD:2 */
+		renesas,channel = <0 1 2>;
+		regulators = "vlcd_3v", "vlcd_1v8";
+		rt-boot = <&rt2>;
+	};
+/*custom_t peter  add lcd3 */
+	lcdc3: lcdc3@fe940000 {
+	compatible = "renesas,lcdc-r8a7373", "renesas,lcdc-shmobile";
+	reg = <0xfe940000 0x4000>,
+		<0xe61c2000 0x40>,
+		<0xbb8 0>;
+	reg-names = "lcdc0", "irq_generator", "rt_irq";
+	/* LCDC_CLK_BUS:0 LCDC_CLK_PERIPHERAL:1 LCDC_CLK_EXTERNAL:2 */
+	renesas,clock-source = <0 1 2>;
+	renesas,col-fmt-bpp = <32>;
+	renesas,desense-offset= <0>;
+	/* LCDC_CHAN_DISABLED:0 LCDC_CHAN_MAINLCD:1 LCDC_CHAN_SUBLCD:2 */
+	renesas,channel = <0 1 2>;
+	regulators = "vlcd_3v", "vlcd_1v8";
+	rt-boot = <&rt3>;
+	};
+
+};

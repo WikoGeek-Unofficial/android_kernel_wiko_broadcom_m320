@@ -1,0 +1,118 @@
+#!/bin/bash
+#--------------------------- COPYRIGHT INFORMATION ----------------------
+# This program contains proprietary information that is a trade secret of
+# Renesas and also is protected as an unpublished work under
+# applicable Copyright laws. Recipient is to retain this program in
+# confidence and is not permitted to use or make copies thereof other than
+# as permitted in a written agreement with Renesas.
+#
+# Copyright (C) 2013 Renesas Mobile Corporation.
+# All rights reserved.
+#---------------------------------------------------------------------------
+#
+# Script to setup build environment
+#
+
+export ENV_HOME=`dirname $PWD`
+export SCRIPTS_ROOT=$ENV_HOME/scripts
+export ANDROID_ROOT=$ENV_HOME/android
+export KERNEL_ROOT=$ENV_HOME/android/kernel
+export BIZEN_ROOT=$ENV_HOME/BIZEN
+export TOOLS_ROOT=$ENV_HOME/tool
+# Barebox exports
+export BAREBOX_ROOT=$ENV_HOME/android/bootable/bootloader/barebox/src
+export RLOADER_ROOT=$ENV_HOME/android/bootable/bootloader/barebox/APE
+export PERFORMANCE_BUILD=false
+export ARCH=arm
+export CROSS_COMPILE=$ANDROID_ROOT/prebuilts/gcc/linux-x86/arm/arm-eabi-4.7/bin/arm-eabi-
+export KERNEL_CROSS_COMPILE=$CROSS_COMPILE
+# update toolchain PATH
+export PATH=$ANDROID_ROOT/prebuilts/gcc/linux-x86/arm/arm-eabi-4.7/bin/:$PATH
+
+# gpt setup
+export GPT_DIR=$ENV_HOME/gpt
+
+#echo "COMMAND = `basename $0` $*"
+
+# XXX: All command line Parsing must go here
+# NOTE: source command implicitly takes all command line
+#       arguments from parent shell script
+OPTIND=1;
+while getopts j:v:o:p:b:d:t:r:c:h:s opt $@
+do
+  case "$opt" in
+    j)
+	  export NJOBS="-j $OPTARG"
+	  ;;
+    v)
+	  export build_number="$OPTARG"
+	  ;;
+    o)
+      # To Generate OTA package
+	  export ANDROID_OTA_PACKAGE="$OPTARG"
+	  ;;
+    b)
+      # for build_rlte_setup
+      export SEL_TARGET_PRODUCT="$OPTARG"
+      #for build_eos2_barebox
+      export SEL_RLTE_BOARD="$OPTARG"
+      ;;
+    d)
+      BOOTIMG_DTB_FILE=$OPTARG
+      export BOOTIMG_DTB_FILE
+      ;;
+    p)
+      # for build_rlte_setup
+      export SEL_TARGET_PRODUCT="$OPTARG"
+      #for build_eos2_barebox
+      export SEL_RLTE_BOARD="$OPTARG"
+      PERFORMANCE_BUILD=true
+      ;;
+    t)
+      # for barebox
+      if [ "$OPTARG" == "disable" ]; then
+        # Trustzone is disabled
+        export DISABLE_TZ=true
+      fi
+      ;;
+    r)
+      # for barebox
+      export SEL_RLTE_HWREV=$OPTARG
+      ;;
+    c)
+      # for barebox
+      export SEL_BAREBOX_APE_CONFIG=$OPTARG
+      ;;
+    s)
+      # for dist
+      export ANDROID_BUILD_TARGET=dist
+      ;;
+    h)
+      # for all scripts
+      usage
+      exit 0
+      ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+if [ "x$NJOBS" == "x" ]; then
+	# NJOBS specifies the number of jobs(make commands) to run simultaneously.
+	: ${CHECK_NCPUS:="`getconf _NPROCESSORS_ONLN`"}
+
+	if [ "$CHECK_NCPUS" -gt 1 ]
+	then
+		export NJOBS="-j $((CHECK_NCPUS + 1))"
+	else
+		export NJOBS=""
+	fi
+fi
+HOST=`/bin/hostname`
+SITEHOSTFROM=$(echo $HOST |cut -c 1-5 )
+if [ "${SITEHOSTFROM}" == "babld" ]; then
+        export NJOBS="-j 12"
+fi
+
+echo "===================================================="
+echo "ENV_HOME    : $ENV_HOME"
+echo "===================================================="

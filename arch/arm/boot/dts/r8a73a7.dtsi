@@ -1,0 +1,97 @@
+/*
+ * Device Tree Source for the r8a73a7 SoC
+ *
+ * Copyright (C) 2014 Broadcom India Research
+ *
+ * This file is licensed under the terms of the GNU General Public License
+ * version 2.  This program is licensed "as is" without any warranty of any
+ * kind, whether express or implied.
+ */
+
+#include "eos-soc-common.dtsi"
+
+/{
+	compatible = "renesas,r8a73a7";
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <0>;
+		};
+
+		cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <1>;
+		};
+
+		cpu@2 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <2>;
+		};
+
+		cpu@3 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <3>;
+		};
+
+	};
+
+	gic: interrupt-controller@f1001000 {
+		compatible = "arm,cortex-a7-gic", "arm,cortex-a15-gic";
+		interrupt-controller;
+		reg = <0xf1001000 0x1000>,
+		      <0xf1002000 0x2000>,
+		      <0xf1004000 0x2000>,
+		      <0xf1006000 0x2000>;
+		interrupts = <GIC_PPI 9 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_HIGH)>;
+		#interrupt-cells = <3>;
+	};
+
+	pmu {
+		compatible = "arm,cortex-a7-pmu";
+		interrupts = <GIC_SPI 77 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 78 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 124 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
+	};
+};
+
+&thermal {
+	compatible = "rmobile,ths-thermal", "renesas,rcar-thermal";
+	hysteresis = <5000>;
+	enable-reset;
+	shutdown-temperature = <105000>;
+	num-trips = <5>;
+
+	trip0-temp = <0>;
+	trip0-max-freq = <1196000000>;
+	trip0-hotplug-mask = <0xF>;
+	trip0-type = "active";
+
+	trip1-temp = <70000>;
+	trip1-max-freq = <897000000>;
+	trip1-hotplug-mask = <0xF>;
+	trip1-type = "active";
+
+	trip2-temp = <80000>;
+	trip2-max-freq = <523250000>;
+	trip2-hotplug-mask = <0xF>;
+	trip2-type = "active";
+
+	trip3-temp = <90000>;
+	trip3-max-freq = <299000000>;
+	trip3-hotplug-mask = <0xF>;
+	trip3-type = "active";
+
+	trip4-temp = <100000>;
+	trip4-max-freq = <0>;
+	trip4-hotplug-mask = <0x0>;
+	trip4-type = "critical";
+};

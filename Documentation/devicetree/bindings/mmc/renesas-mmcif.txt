@@ -1,0 +1,35 @@
+* Renesas Multi Media Card Interface
+
+The Renesas MMCIF module is a host interface supports JEDEC STANDARD
+JESD84-A441. This module allows connection with Multi Media Card.
+
+This file documents differences between the core properties in mmc.txt
+and the properties used by the renesas_mmcif driver.
+
+Required properties
+- compatible: Should be "renesas,renesas-mmcif" for r8a7373 board.
+
+Optional properties:
+- renesas,sup-pclk: set if host clock is not supplied
+- renesas,dma-min-size: minimum data size to use dma channel.
+  Otherwise use pio.
+- renesas,buf-acc: Buffer access config register. Determines the
+  mode of DMA transfer
+- data-delay-ps: Output data delay selection register (CE_DELAY_SEL)
+
+Example:
+mmcif: mmcif@e6bd0000 {
+	compatible = "renesas,renesas-mmcif";
+	reg = <0xe6bd0000 0x100>;
+	interrupt-parent = <&gic>;
+	interrupts = <0 122 0x4>;
+	bus-width = <8>;
+	max-frequency = <52000000>;
+	status = "disabled";
+	non-removable;
+	cap-mmc-highspeed;
+	renesas,sup-pclk = <0>;
+	renesas,dma-min-size = <0>;
+	renesas,buf-acc = <0>;
+	renesas,data-delay-ps = <0>;
+};

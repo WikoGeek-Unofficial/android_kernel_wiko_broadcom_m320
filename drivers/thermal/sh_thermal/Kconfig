@@ -1,0 +1,17 @@
+#
+# SH thermal configuration
+#
+config SH_THERMAL
+	tristate "SH Mobile thermal driver"
+	depends on THERMAL
+	depends on ARCH_SHMOBILE
+	help
+	  Enables SH thermal driver to monitor temperature
+	  levels and thermal throttling.
+
+config HOTPLUG_THERMAL
+	tristate "Hotplug coolant"
+	depends on SH_THERMAL
+	help
+	  Enables generic hotplug thermal coolant for thermal
+	  throttling.

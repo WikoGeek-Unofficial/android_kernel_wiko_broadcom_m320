@@ -1,0 +1,61 @@
+#!/bin/bash
+#--------------------------- COPYRIGHT INFORMATION ----------------------
+# This program contains proprietary information that is a trade secret of
+# Renesas and also is protected as an unpublished work under
+# applicable Copyright laws. Recipient is to retain this program in
+# confidence and is not permitted to use or make copies thereof other than
+# as permitted in a written agreement with Renesas.
+#
+# Copyright (C) 2013 Renesas Mobile Corporation.
+# All rights reserved.
+#---------------------------------------------------------------------------
+#
+# Clean kernel source code
+#
+
+# Exit script if fail
+set -e
+set -o pipefail
+
+#
+# Function to print usage
+# XXX: this function must be defined before 'source build_eos2_envsetup'
+#
+usage() {
+  echo ""
+  echo "Usage:"
+  echo "  `basename $0` [-b <config>]"
+  echo ""
+  echo "Where:"
+  echo "  <config> is optional command line argument"
+  echo "    if = <board-name> or <board-name>-eng, build android eng build"
+  echo "    if = <board-name>-user, build android user build"
+  echo "    if = <board-name>-debug, build kernel debug build"
+  echo "    valid <board-name> = 'afyonlte'"
+  echo ""
+}
+
+# Setup build environment and select Board
+source build_rlte_setup
+
+# Local variables
+LOGF=${SCRIPTS_ROOT}/log_kernel.txt
+KERNEL_INSTALLED_BINARY=$ANDROID_ROOT/out/target/product/${RLTE_TARGET}/kernel
+
+# main()
+{
+  # Remove product out kernel binary, if exist
+  if [ -f $KERNEL_INSTALLED_BINARY ]; then
+    echo "$ Deleting $KERNEL_INSTALLED_BINARY"
+    rm -rf $KERNEL_INSTALLED_BINARY
+  fi
+  # clean kernel output, if exist
+  if [ -d $KERNEL_OUTPUT ]; then
+    echo "$ make -C $KERNEL_ROOT O=$KERNEL_OUTPUT distclean"
+    make -C $KERNEL_ROOT O=$KERNEL_OUTPUT distclean
+    echo "$ make -C $KERNEL_ROOT O=$KERNEL_OUTPUT mrproper"
+    make -C $KERNEL_ROOT O=$KERNEL_OUTPUT mrproper
+  fi
+  cd $SCRIPTS_ROOT >/dev/null 2>&1
+
+} 2>&1 | tee $LOGF

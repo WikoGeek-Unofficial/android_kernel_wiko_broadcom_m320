@@ -1,0 +1,506 @@
+#!/bin/bash
+#--------------------------- COPYRIGHT INFORMATION ----------------------
+# This program contains proprietary information that is a trade secret of
+# Renesas and also is protected as an unpublished work under
+# applicable Copyright laws. Recipient is to retain this program in
+# confidence and is not permitted to use or make copies thereof other than
+# as permitted in a written agreement with Renesas.
+#
+# Copyright (C) 2013 Renesas Mobile Corporation.
+# All rights reserved.
+#---------------------------------------------------------------------------
+#
+# Configure board specific details
+#
+# Usage:
+#   build_rlte_setup [-b <config>]
+#
+# Where:
+#    <config> is optional command line argument
+#      <config> pattern : <board-name>_<ramsize>_<emmc>_<board-type>-<build-type>
+#      valid <board-name> defined in array_board variable
+#      valid <ramsize>    defined in array_ramsize variable
+#      valid <emmc>       defined in array_emmc variable
+#      valid <board-name> defined in array_board variable
+#      valid <board-type> defined in array_board_type_<board-name>
+#      valid <build-type> defined in array_build_type
+#
+
+# Setup build environment
+source build_eos2_envsetup
+
+# Local variables
+RLTE_VENDOR=broadcom
+export AMETHYST_C=false
+
+# Global Variable Initialization
+KERNEL_DEBUG_ENABLED=false
+KERNEL_FTRACE_ENABLED=false
+ENABLE_MOBICORE=false
+ENABLE_INTERNAL_SD=false
+ENABLE_512_RAM=false
+EMMC_4GB=false
+
+# Define list of boards
+array_board=(afyonlte amethyst amethyst_c amethyst_c_launcher3 p35b p35b_c l4020ap_c heatlte u2b_amethyst u2b_amethyst_c u2b_heatlte vivaltolte)
+
+# Define board types
+# By default each board should have 'nonsec' type defined
+array_board_type_afyonlte=(nonsec)
+array_board_type_amethyst=(nonsec sec)
+array_board_type_amethyst_c=(nonsec)
+array_board_type_amethyst_c_launcher3=(nonsec)
+array_board_type_p35b=(nonsec)
+array_board_type_p35b_c=(nonsec)
+array_board_type_l4020ap_c=(nonsec)
+array_board_type_heatlte=(nonsec sec)
+array_board_type_u2b_amethyst=(nonsec sec)
+array_board_type_u2b_amethyst_c=(nonsec sec)
+array_board_type_u2b_heatlte=(nonsec)
+array_board_type_vivaltolte=(nonsec sec)
+
+# Define RAM size
+array_ramsize=(512 Normal)
+# Define EMMC option
+array_emmc=(emmc_4gb Normal)
+# Define build types
+array_build_type=(eng debug user)
+# Delimeters that separate the options
+BUILD_TYPE_DELIM=-
+BUILD_BOARDTYPE_DELIM=_
+
+SEL_TARGET_BOARD=
+SEL_TARGET_BOARD_TYPE=
+SEL_TARGET_BUILD_TYPE=
+
+create_and_verify_input_string()
+{
+	board=$1
+    declare -a array_boardtype=("${!2}")
+	input=$3
+
+	ret=
+	for ramsize in ${array_ramsize[@]}; do
+		for emmc in ${array_emmc[@]}; do
+			for boardtype in ${array_boardtype[@]}; do
+				for buildtype in ${array_build_type[@]}; do
+					buildarg=$board
+					if [ $ramsize != "Normal" ]; then
+						buildarg=${buildarg}${BUILD_BOARDTYPE_DELIM}${ramsize}
+					fi
+					if [ $emmc != "Normal" ]; then
+						buildarg=${buildarg}${BUILD_BOARDTYPE_DELIM}${emmc}
+					fi
+					if [ $boardtype != "nonsec" ]; then
+						buildarg=${buildarg}${BUILD_BOARDTYPE_DELIM}${boardtype}
+					fi
+					buildarg=${buildarg}${BUILD_TYPE_DELIM}${buildtype}
+					if [ $buildarg == $input ]; then
+						SEL_TARGET_BOARD=${board}
+						# sec cannot be mixed with 512 and emmc
+						if [ "${ramsize}" == "512" ]; then
+							export ENABLE_512_RAM=true
+							if [ ${boardtype} == "sec" ]; then
+								echo "Error : sec option is not valid with 512"
+								exit -1
+							fi
+							SEL_TARGET_BOARD_TYPE="nonsec"
+						else
+							export ENABLE_512_RAM=false
+							SEL_TARGET_BOARD_TYPE=${boardtype}
+						fi
+						if [ "${emmc}" == "emmc_4gb" ]; then
+							export EMMC_4GB=true
+							if [ ${boardtype} == "sec" ]; then
+								echo "Error : sec option is not valid with EMMC_4GB"
+								exit -1
+							fi
+							SEL_TARGET_BOARD_TYPE="nonsec"
+						else
+							export EMMC_4GB=false
+							SEL_TARGET_BOARD_TYPE=${boardtype}
+						fi
+						SEL_TARGET_BUILD_TYPE=${buildtype}
+						ret=0
+						return
+					fi
+				done
+			done
+		done
+	done
+
+	ret=1
+	return
+}
+
+verify_build_string()
+{
+	input=$1
+
+	for board in ${array_board[@]}; do
+		create_and_verify_input_string "${board}" array_board_type_${board}[@] "$input"
+		if [ ${ret} -eq 0 ]; then
+			break
+		fi
+	done
+}
+
+check_input()
+{
+	if [ $1 -ge 0 2> /dev/null ]; then
+		if [ $1 -le $2 ]
+		then
+			ret=0
+			return
+		fi
+	fi
+	ret=1
+}
+
+menu_name()
+{
+	input=$1
+	menu_option=(${input//[/ })
+	menu_option=(${menu_option//array_/ })
+}
+
+read_input()
+{
+	declare -a array_in=("${!1}")
+
+	array_size=${#array_in[@]}
+
+	#
+	## skipping if only one entry
+	## no need to check in that case
+	#
+	if [ $array_size -eq 1 ]; then
+		read_input_result=${array_in[0]}
+		return
+	fi
+
+	menu_name $1
+	while :
+	do
+		echo "============================================"
+		echo " Select ${menu_option}:"
+		echo "============================================"
+		count=1
+		for i in ${array_in[@]}; do
+			echo "${count}. ${i}"
+			let "count += 1"
+		done
+		echo "0: Exit"
+		echo "============================================"
+		echo -n "Enter your choice: "
+		read user_kb_input
+		if [ "x${user_kb_input}" == "x" ]; then
+			echo "Not a valid board option, try again"
+			continue
+		fi
+		check_input ${user_kb_input} ${array_size}
+		if [ $ret -eq 0 ]; then
+			break;
+		else
+			echo "Not a valid board option, try again"
+		fi
+	done
+
+	if [ ${user_kb_input} -eq 0 ]; then
+		exit 0;
+	fi
+	read_input_result=${array_in[$user_kb_input - 1]}
+}
+
+# Validation check if previously exported
+if [ "x${SEL_TARGET_PRODUCT}" == "x" ]; then
+	#
+	## Board Option
+	#
+	if [ "x${SEL_TARGET_BOARD}" == "x" ]; then
+		read_input array_board[@]
+		SEL_TARGET_BOARD=${read_input_result}
+	fi
+
+	#
+	## RAM size 512MB or not
+	#
+	read_input array_ramsize[@]
+	if [ "${read_input_result}" != "512" ]; then
+		export ENABLE_512_RAM=false
+	else
+		export ENABLE_512_RAM=true
+	fi
+
+	#
+	## EMMC option
+	#
+	read_input array_emmc[@]
+	if [ "${read_input_result}" != "emmc_4gb" ]; then
+		export EMMC_4GB=false
+	else
+		export EMMC_4GB=true
+	fi
+
+	#
+	## Board Type Option
+	#
+	if [ ${ENABLE_512_RAM} == true ]; then
+		# For RAM 512MB, only option is nonsec
+		SEL_TARGET_BOARD_TYPE="nonsec"
+	fi
+	if [ ${EMMC_4GB} == true ]; then
+		# For emmc_4gb, only option is nonsec
+		SEL_TARGET_BOARD_TYPE="nonsec"
+	fi
+	if [ "x${SEL_TARGET_BOARD_TYPE}" == "x" ]; then
+		read_input array_board_type_${SEL_TARGET_BOARD}[@]
+		SEL_TARGET_BOARD_TYPE=${read_input_result}
+	fi
+
+	#
+	## Build Type Option
+	#
+	if [ "x${SEL_TARGET_BUILD_TYPE}" == "x" ]; then
+		read_input array_build_type[@]
+		SEL_TARGET_BUILD_TYPE=${read_input_result}
+	fi
+
+	SEL_TARGET_PRODUCT=${SEL_TARGET_BOARD}
+	if [ ${ENABLE_512_RAM} == true ]; then
+		SEL_TARGET_PRODUCT=${SEL_TARGET_PRODUCT}${BUILD_BOARDTYPE_DELIM}512
+	fi
+	if [ ${EMMC_4GB} == true ]; then
+		SEL_TARGET_PRODUCT=${SEL_TARGET_PRODUCT}${BUILD_BOARDTYPE_DELIM}emmc_4gb
+	fi
+	if [ ${SEL_TARGET_BOARD_TYPE} != "nonsec" ]; then
+		SEL_TARGET_PRODUCT=${SEL_TARGET_PRODUCT}${BUILD_BOARDTYPE_DELIM}${SEL_TARGET_BOARD_TYPE}
+	fi
+	SEL_TARGET_PRODUCT=${SEL_TARGET_PRODUCT}${BUILD_TYPE_DELIM}${SEL_TARGET_BUILD_TYPE}
+else
+	verify_build_string ${SEL_TARGET_PRODUCT}
+fi
+
+#
+## Defining build environment variables
+#
+RLTE_BOARD=${SEL_TARGET_BOARD}
+RLTE_TARGET=${SEL_TARGET_BOARD}
+RLTE_CHIP=u2
+RLTE_HWREV=rev000
+export GPT_BUILD_ENABLED=1
+
+case ${SEL_TARGET_BOARD} in
+	"afyonlte")
+		export GPT_TARGETS=eos_8G_board_common
+		;;
+	"amethyst")
+		RLTE_HWREV=edn000
+		export GPT_TARGETS=eos_8G_board_common
+		;;
+	"amethyst_c")
+		KERNEL_LOGLEVEL=4
+		RLTE_BOARD=amethyst
+		RLTE_HWREV=edn000
+		ENABLE_INTERNAL_SD=true
+		if [ ${EMMC_4GB} == true ]; then
+			export GPT_TARGETS=eos_4G_board_common
+		else
+			export GPT_TARGETS=eos_8G_board_internal_SD
+		fi
+		;;
+	"amethyst_c_launcher3")
+		RLTE_BOARD=amethyst
+		RLTE_HWREV=edn000
+		ENABLE_INTERNAL_SD=true
+		export GPT_TARGETS=eos_8G_board_internal_SD
+		;;
+	"p35b")
+		KERNEL_LOGLEVEL=0
+		RLTE_HWREV=edn000
+		export GPT_TARGETS=eos_4G_board_common
+		;;
+	"p35b_c")
+		RLTE_BOARD=p35b
+		RLTE_HWREV=edn000
+		ENABLE_INTERNAL_SD=true
+		export GPT_TARGETS=eos_4G_board_common
+		;;
+	"l4020ap_c")
+		KERNEL_LOGLEVEL=0
+		RLTE_HWREV=edn000
+		export AMETHYST_C=true
+		export GPT_TARGETS=eos_4G_board_common
+		;;
+	"heatlte")
+		export GPT_TARGETS=eos_8G_board_common
+		;;
+	"vivaltolte")
+		RLTE_HWREV=rev000
+		export GPT_TARGETS=eos_4G_board_common
+		;;
+	"u2b_amethyst")
+		RLTE_CHIP=u2b
+		RLTE_HWREV=edn000
+		RLTE_BOARD=amethyst
+		export GPT_TARGETS=eos_8G_board_common
+		;;
+	"u2b_amethyst_c")
+		RLTE_CHIP=u2b
+		RLTE_HWREV=edn000
+		RLTE_BOARD=amethyst
+		ENABLE_INTERNAL_SD=true
+		export GPT_TARGETS=eos_8G_board_internal_SD
+		;;
+	"u2b_heatlte")
+		RLTE_CHIP=u2b
+		RLTE_BOARD=heatlte
+		export GPT_TARGETS=eos_8G_board_common
+		;;
+	*)
+		echo "Invalid entry ${SEL_TARGET_PRODUCT} , try again"
+		exit -1;
+		;;
+esac
+
+case ${SEL_TARGET_BOARD_TYPE} in
+	"nonsec")
+		;;
+	"sec")
+		ENABLE_MOBICORE=true
+		;;
+	*)
+		echo "Invalid entry ${SEL_TARGET_PRODUCT} , try again"
+		exit -1;
+		;;
+esac
+
+case ${SEL_TARGET_BUILD_TYPE} in
+	"eng")
+		if [ "x$KERNEL_LOGLEVEL" == "x" ] ; then
+			KERNEL_LOGLEVEL=7
+		fi
+		KERNEL_FTRACE_ENABLED=true
+		RLTE_BUILD_TYPE=eng
+		;;
+	"debug")
+		KERNEL_LOGLEVEL=7
+		KERNEL_DEBUG_ENABLED=true
+		KERNEL_FTRACE_ENABLED=true
+		RLTE_BUILD_TYPE=eng
+		;;
+	"user")
+		KERNEL_LOGLEVEL=0
+		RLTE_BUILD_TYPE=user
+		;;
+	*)
+		echo "Invalid entry ${SEL_TARGET_PRODUCT} , try again"
+		exit -1;
+		;;
+esac
+
+# Configure board defconfig file
+if [ "x$RLTE_DEFCONFIG" == "x" ] || [ "x$RLTE_TARGET_PRODUCT" == "x" ] ; then
+
+  RLTE_DEFCONFIG=${RLTE_CHIP}_${RLTE_BOARD}_${RLTE_HWREV}_defconfig
+
+  if [ "$RLTE_BOARD" == "amethyst" ] ||
+     [ "$RLTE_BOARD" == "amethyst_c" ] ||
+     [ $RLTE_BOARD == "p35b" ] ||
+     [ $RLTE_BOARD == "l4020ap_c" ]; then
+	RLTE_DEFCONFIG=eos_common_defconfig
+  fi
+  if [ ! -e $KERNEL_ROOT/arch/arm/configs/$RLTE_DEFCONFIG ]; then
+	  echo "Board defconfig file [${RLTE_DEFCONFIG}] Missing"
+	  exit -1
+  fi
+  if [ "$KERNEL_DEBUG_ENABLED" == "true" ] ; then
+    $KERNEL_ROOT/scripts/kconfig/merge_config.sh -m $KERNEL_ROOT/arch/arm/configs/$RLTE_DEFCONFIG $KERNEL_ROOT/arch/arm/configs/debug_configs
+    mv -f .config $KERNEL_ROOT/arch/arm/configs/debug_$RLTE_DEFCONFIG
+    RLTE_DEFCONFIG=debug_${RLTE_DEFCONFIG}
+  fi
+
+  if [ "$KERNEL_FTRACE_ENABLED" == "true" ] ; then
+    $KERNEL_ROOT/scripts/kconfig/merge_config.sh -m $KERNEL_ROOT/arch/arm/configs/$RLTE_DEFCONFIG $KERNEL_ROOT/arch/arm/configs/ftrace_configs
+    mv -f .config $KERNEL_ROOT/arch/arm/configs/ftrace_$RLTE_DEFCONFIG
+    RLTE_DEFCONFIG=ftrace_${RLTE_DEFCONFIG}
+  fi
+
+  #	Adding mobicore specific config flags
+  if [ "$ENABLE_MOBICORE" == "true" ] ; then
+	echo "Choosen SecureOS variant, appending mobicore kerenl configs"
+    $KERNEL_ROOT/scripts/kconfig/merge_config.sh -m $KERNEL_ROOT/arch/arm/configs/$RLTE_DEFCONFIG $KERNEL_ROOT/arch/arm/configs/mobicore_defconfig
+    mv -f .config $KERNEL_ROOT/arch/arm/configs/secureOS_$RLTE_DEFCONFIG
+    RLTE_DEFCONFIG=secureOS_${RLTE_DEFCONFIG}
+  fi
+
+  # Changes for performance build
+  if [ "$PERFORMANCE_BUILD" == "true" ]; then
+	 if [ "$RLTE_BUILD_TYPE" == "user" ]; then
+		sed -i 's/CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND=y/# CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND is not set/' $KERNEL_ROOT/arch/arm/configs/$RLTE_DEFCONFIG
+		sed -i '/# CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND is not set/a CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE=y' $KERNEL_ROOT/arch/arm/configs/$RLTE_DEFCONFIG
+	 else
+		echo "Please run user build !!!"
+		exit
+	 fi
+  fi
+
+  #
+  # Export all required variable
+  #
+
+  # Export android lunch
+  export RLTE_TARGET_PRODUCT=$RLTE_TARGET-$RLTE_BUILD_TYPE
+
+  # Afyontlte xx changes for CP :SSGAFYE02-295
+  if [ "$RLTE_TARGET" == "afyonlte" ] ; then
+	export RLTE_TARGET_PRODUCT=$RLTE_TARGET'xx'-$RLTE_BUILD_TYPE
+  fi
+
+  export RLTE_VENDOR RLTE_TARGET RLTE_BUILD_TYPE
+
+  # kernel exports
+  export RLTE_CHIP RLTE_BOARD RLTE_HWREV RLTE_DEFCONFIG KERNEL_DEBUG_ENABLED KERNEL_FTRACE_ENABLED KERNEL_LOGLEVEL
+  # export kernel output variables
+  export ANDROID_OUT_TARGET=${ANDROID_ROOT}/out/target/product/${RLTE_TARGET}
+  export KERNEL_OUTPUT=${ANDROID_ROOT}/out/target/product/${RLTE_TARGET}/kbuild/${RLTE_DEFCONFIG}/kernel
+  export MODULE_OUTPUT=${KERNEL_OUTPUT}
+  # barebox ouput directories
+  export RLOADER_OUTPUT=$ANDROID_OUT_TARGET/kbuild/barebox/APE/bin
+
+  #MOBICORE exports
+  export ENABLE_MOBICORE
+
+  #Internal sdcard support exports
+  export ENABLE_INTERNAL_SD
+fi
+
+echo " build_rlte_setup calculating ramdisk offset"
+KERNEL_SYMBOLS=${KERNEL_OUTPUT}/System.map
+export KERNEL_RAMDISK_OFFSET='0x01400000'
+if [ -f $KERNEL_SYMBOLS ] ; then
+  KERNEL_RAMDISK_OFFSET2='0x'$(grep -E "A _end|B _end" $KERNEL_SYMBOLS | head -c8)
+  KERNEL_RAMDISK_OFFSET2=$(($KERNEL_RAMDISK_OFFSET2-0xC0000000))
+  KERNEL_RAMDISK_OFFSET2=$(($KERNEL_RAMDISK_OFFSET2&0xFFFFF000))
+  KERNEL_RAMDISK_OFFSET2=$(($KERNEL_RAMDISK_OFFSET2+0x80000))
+  if [ $KERNEL_RAMDISK_OFFSET2 -gt 16777216 ] ; then #default android ramdisk offset 0x1000000
+    export KERNEL_RAMDISK_OFFSET='0x'$(echo "ibase=10 ; obase=16 ; $KERNEL_RAMDISK_OFFSET2" | bc)
+  fi
+  echo " ramdisk offset $KERNEL_RAMDISK_OFFSET"
+fi
+
+echo "===================================================="
+echo " RLTE_VENDOR         : $RLTE_VENDOR"
+echo " RLTE_TARGET         : $RLTE_TARGET"
+echo " RLTE_BUILD_TYPE     : $RLTE_BUILD_TYPE"
+echo " RLTE_TARGET_PRODUCT : $RLTE_TARGET_PRODUCT"
+echo " RLTE_CHIP           : $RLTE_CHIP"
+echo " RLTE_BOARD          : $RLTE_BOARD"
+echo " RLTE_HWREV          : $RLTE_HWREV"
+echo " KERNEL_DEBUG        : $KERNEL_DEBUG_ENABLED"
+echo " ENABLE_MOBICORE     : $ENABLE_MOBICORE"
+echo " ENABLE_INTERNAL_SD  : $ENABLE_INTERNAL_SD"
+echo " KERNEL_DEFCONFIG    : $RLTE_DEFCONFIG"
+echo " ENABLE_512_RAM      : $ENABLE_512_RAM"
+echo " EMMC_4GB            : $EMMC_4GB"
+echo "===================================================="

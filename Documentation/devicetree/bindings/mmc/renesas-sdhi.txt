@@ -1,0 +1,47 @@
+* Renesas SD Host Interface
+
+The Renesas SD Host Interface provides an interface for SD and SDIO type of
+memory cards.
+
+This file documents differences between the core properties described
+by mmc.txt and the properties used by the renesas_sdhi driver.
+
+Required properties:
+ - compatible: Should be "renesas,sdhi-r8a7373" for r8a7373 board.
+
+Optional properties:
+ - renesas,dma-en-val : enables or disables DMA mode. Set 0x2 to enable.
+   0 means disable.
+ - renesas,dma-alignment : DMA alignment size. Default is 2.
+ - renesas,dma-min-size : minimum data size to use dma transfer. Default value
+   is 8.
+ - renesas,detect-irq : external card detect irq.
+ - renesas,detect-msec : specifies msecs delay between detect interrupt
+   detect work queue.
+ - renesas,card-stat-sysfs : if present, card status will be exported into
+   sysfs.
+ - renesas,sdhi-wp-disable : sets the RENESAS_SDHI_WP_DISABLE flag which will
+   disable write protection check.
+ - renesas,sdhi-sdclk-offen : Enable Card clock auto off.
+ - renesas,sdhi-sdclk-div1 : Enable SDCLK div 1.
+ - renesas,sdhi-dma-slave-config : Runtime DMA config support
+ - renesas,pm-ignore-pm-notify : sets MMC_PM_IGNORE_PM_NOTIFY pm_caps flag
+   to ignore mmc pm notify.
+ - renesas,suspend-pwr-ctrl : Restore the power status after suspend resume.
+
+Example:
+sdhi0: sdhi@ee100000 {
+        compatible = "renesas,sdhi-r8a7373";
+        reg = <0xee100000 0x100>;
+        interrupt-parent = <&gic>;
+        interrupts = <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>;
+        renesas,dma-en-val = <0>;
+        renesas,dma-alignment = <0>;
+        renesas,dma-min-size = <0>;
+        renesas,detect-irq = <2050>;
+        renesas,detect-msec = <0>;
+        renesas,card-stat-sysfs;
+        renesas,sdhi-wp-disable;
+        renesas,sdhi-sdclk-offen;
+        renesas,sdhi-sdclk-div1;
+};

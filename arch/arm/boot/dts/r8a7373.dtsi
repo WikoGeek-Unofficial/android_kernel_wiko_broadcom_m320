@@ -1,0 +1,151 @@
+/******************************************************************************/
+/*                                                                            */
+/* Copyright 2014 Broadcom Corporation                                        */
+/*                                                                            */
+/* Unless you and Broadcom execute a separate written software license        */
+/* agreement governing use of this software, this software is licensed        */
+/* to you under the terms of the GNU General Public License version 2         */
+/* (the GPL), available at                                                    */
+/*                                                                            */
+/* http://www.broadcom.com/licenses/GPLv2.php                                 */
+/*                                                                            */
+/* with the following added to such license:                                  */
+/*                                                                            */
+/* As a special exception, the copyright holders of this software give        */
+/* you permission to link this software with independent modules, and         */
+/* to copy and distribute the resulting executable under terms of your        */
+/* choice, provided that you also meet, for each linked independent           */
+/* module, the terms and conditions of the license of that module.            */
+/* An independent module is a module which is not derived from this           */
+/* software. The special exception does not apply to any modifications        */
+/* of the software.                                                           */
+/*                                                                            */
+/* Notwithstanding the above, under no circumstances may you combine          */
+/* this software in any way with any other Broadcom software provided         */
+/* under a license other than the GPL, without Broadcom's express             */
+/* prior written consent.                                                     */
+/*                                                                            */
+/******************************************************************************/
+
+#include "eos-soc-common.dtsi"
+
+/{
+	compatible = "renesas,r8a7373";
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a9";
+			reg = <0>;
+		};
+
+		cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a9";
+			reg = <1>;
+		};
+	};
+
+	scu@f0000000 {
+		compatible = "arm,cortex-a9-scu";
+		reg = <0xf0000000 0x100>;
+	};
+
+	gic: interrupt-controller@f0001000 {
+		compatible = "arm,cortex-a9-gic";
+		interrupt-controller;
+		reg = <0xf0001000 0x1000>,
+		      <0xf0000100 0x100>;
+		#interrupt-cells = <3>;
+	};
+
+	pmu {
+		compatible = "arm,cortex-a9-pmu";
+		interrupts = <GIC_SPI 77 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 78 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	cache-controller@f0100000 {
+		compatible = "arm,pl310-cache";
+		reg = <0xf0100000 0x1000>;
+		arm,data-latency = <3 3 3>;
+		arm,tag-latency = <2 2 2>;
+		arm,filter-ranges = <0x40000000 0x20000000>;
+		cache-unified;
+		cache-level = <2>;
+		interrupts = <GIC_SPI 75 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+#ifdef USE_SENSOR_FRAMEWORK /* Save space - we don't currently use this */
+	/* From sensor framework */
+	irqc14: interrupt-controller@e61c1c00 {
+		compatible = "renesas,irqc";
+		#interrupt-cells = <2>;
+		interrupt-controller;
+		reg = <0xe61c1c00 0x200>;
+		interrupts = <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH>;
+	};
+#endif
+};
+
+&thermal {
+	compatible = "rmobile,ths-thermal", "renesas,rcar-thermal";
+	hysteresis = <5000>;
+	enable-reset;
+	shutdown-temperature = <100000>;
+	num-trips = <4>;
+
+	trip0-temp = <0>;
+	trip0-max-freq = <1196000000>;
+	trip0-hotplug-mask = <0x3>;
+	trip0-type = "active";
+
+	trip1-temp = <75000>;
+	trip1-max-freq = <897000000>;
+	trip1-hotplug-mask = <0x3>;
+	trip1-type = "active";
+
+	trip2-temp = <85000>;
+	trip2-max-freq = <897000000>;
+	trip2-hotplug-mask = <0x1>;
+	trip2-type = "active";
+
+	trip3-temp = <95000>;
+	trip3-max-freq = <0>;
+	trip3-hotplug-mask = <0x0>;
+	trip3-type = "critical";
+};

@@ -1,0 +1,306 @@
+/******************************************************************************/
+/*                                                                            */
+/* Copyright 2014 Broadcom Corporation                                        */
+/*                                                                            */
+/* Unless you and Broadcom execute a separate written software license        */
+/* agreement governing use of this software, this software is licensed        */
+/* to you under the terms of the GNU General Public License version 2         */
+/* (the GPL), available at                                                    */
+/*                                                                            */
+/* http://www.broadcom.com/licenses/GPLv2.php                                 */
+/*                                                                            */
+/* with the following added to such license:                                  */
+/*                                                                            */
+/* As a special exception, the copyright holders of this software give        */
+/* you permission to link this software with independent modules, and         */
+/* to copy and distribute the resulting executable under terms of your        */
+/* choice, provided that you also meet, for each linked independent           */
+/* module, the terms and conditions of the license of that module.            */
+/* An independent module is a module which is not derived from this           */
+/* software. The special exception does not apply to any modifications        */
+/* of the software.                                                           */
+/*                                                                            */
+/* Notwithstanding the above, under no circumstances may you combine          */
+/* this software in any way with any other Broadcom software provided         */
+/* under a license other than the GPL, without Broadcom's express             */
+/* prior written consent.                                                     */
+/*                                                                            */
+/******************************************************************************/
+
+#include "eos-board-common.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
+/{
+	chosen {
+		bootargs = "console=ttySC0,115200 earlyprintk=sh-sci.0,115200";
+		/* custom_t:CJ we dont need this for PP now.
+		linux,sysrq-reset-seq {
+			keyset = <KEY_VOLUMEDOWN KEY_VOLUMEUP>;
+			timeout-ms = <3000>;
+		};
+		*/
+	};
+
+	memory@40000000 {
+		device_type = "memory";
+		reg = <0x40000000 0x40000000>;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		#address-cells = <0>;
+		#size-cells = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_pins>;
+
+		volume-up {
+			label = "+";
+			gpios = <&pfc 1 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+		};
+
+		volume-down {
+			label = "-";
+			gpios = <&pfc 2 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_VOLUMEDOWN>;
+			gpio-key,wakeup;
+		};
+	};
+
+	bcm-bt-rfkill {
+		compatible = "bcm,bcm-bt-rfkill";
+		bcm-bt-rfkill-vreg-gpio = <&pfc 268 GPIO_ACTIVE_HIGH>;
+		bcm-bt-rfkill-n-reset-gpio = <&pfc 15 GPIO_ACTIVE_LOW>;
+	};
+
+        wlan-sdio {
+                compatible = "brcm,wlan-sdio";
+                bcm-wlan-host-wake = <&pfc 98 GPIO_ACTIVE_HIGH>;
+                bcm-wlan-reset = <&pfc 260 GPIO_ACTIVE_HIGH>;
+        };
+/*
+	custom_t:CJ we dont have this hw device
+
+	lsm303dl-input {
+		compatible = "st,lsm303dl-input";
+	};
+*/
+	sound {
+		compatible = "renesas,fsi-snd-d2153";
+		renesas,fsia = <&fsia>;
+		renesas,fsib = <&fsib>;
+		renesas,mclk-freq = <13000000>;
+		renesas,audio-routing =
+			"RECCHL", "AIFOUTL",
+			"RECCHR", "AIFOUTR",
+			"AIFINL", "VCLK4",
+			"AIFINR", "VCLK4",
+			"AIFOUTL", "VCLK4",
+			"AIFOUTR", "VCLK4",
+			"Headphone Jack Left", "Headphone Left PGA",
+			"Headphone Jack Right", "Headphone Right PGA",
+			"Speaker", "Speaker PGA",
+			"Earpiece", "Earpiece PGA";
+	};
+
+	bcm-gps {
+		compatible = "bcm,bcm-gps";
+		bcm-gps-hostwake = <&pfc 0 GPIO_ACTIVE_HIGH>;
+		bcm-gps-regpu-gpio = <&pfc 11 GPIO_ACTIVE_HIGH>;
+	};
+
+	vibrator {
+		compatible = "ss,vibrator";
+		regulator  = "vdd_motor_pmic";
+		voltage    = <2800000>;
+	};
+
+	backlight {
+		compatible = "renesas,tpu-led-backlight";
+		renesas,tpu-channel = "TPU0TO3";
+		max-brightness = <255>;
+		default-brightness = <143>;
+		pinctrl-names = "default", "idle";
+		pinctrl-0 = <&backlight_pin>;
+		pinctrl-1 = <&backlight_pin_hiz>;
+	};
+};
+
+&lcdc {
+	pname = "OTM8018B_DJ";
+	reset-gpio = <&pfc 22 GPIO_ACTIVE_LOW>;
+	te-irq = <&pfc 27 GPIO_ACTIVE_HIGH>;
+	esd-check = <3>; /* 0: Disabled, 1: GPIO, 2: ID SEQ, 3: TE_GPIO video mode only */
+	esd-dur-ms = <1000>;
+	esd-irq = <&pfc 27 GPIO_ACTIVE_HIGH>;
+};
+
+&rt {
+	screen0 {
+		renesas,height = <800>;
+		renesas,width = <480>;
+		renesas,stride = <480>;
+		renesas,mode = <0>; /* Video Mode */
+	};
+};
+
+&lcdc2 {
+	pname = "NT35512";
+	reset-gpio = <&pfc 22 GPIO_ACTIVE_LOW>;
+	te-irq = <&pfc 27 GPIO_ACTIVE_HIGH>;
+	esd-check = <3>; /* 0: Disabled, 1: GPIO, 2: ID SEQ, 3: TE_GPIO video mode only */
+	esd-dur-ms = <1000>;
+	esd-irq = <&pfc 27 GPIO_ACTIVE_HIGH>;
+};
+
+&rt2 {
+	screen0 {
+		renesas,height = <800>;
+		renesas,width = <480>;
+		renesas,stride = <480>;
+		renesas,mode = <0>; /* Video Mode */
+	};
+};
+/*custom_t peter  add lcd3 */
+&lcdc3 {
+	pname = "OTM8018B_BOE";
+	reset-gpio = <&pfc 22 GPIO_ACTIVE_LOW>;
+	te-irq = <&pfc 27 GPIO_ACTIVE_HIGH>;
+	esd-check = <3>; /* 0: Disabled, 1: GPIO, 2: ID SEQ, 3: TE_GPIO video mode only */
+	esd-dur-ms = <1000>;
+	esd-irq = <&pfc 27 GPIO_ACTIVE_HIGH>;
+};
+
+&rt3 {
+	screen0 {
+		renesas,height = <800>;
+		renesas,width = <480>;
+		renesas,stride = <480>;
+		renesas,mode = <0>; /* Video Mode */
+	};
+};
+     
+&pfc {
+	hogs {
+		unused-pins {
+			renesas,groups =
+				"scifa0_clk", "scifa1_ctrl", "scifa1_clk",
+				"scifb3_data", "vio_cko5", "bsc_rd_we16",
+				"bsc_cs0", "bsc_cs2", "bsc_cs4", "bsc_wait",
+				"bsc_rdwr", "bsc_data16", "bsc_cko",
+				"bsc_addr_0_10","fsib_mclk_in", "sdhi2_data4",
+				"sdhi2_ctrl", "sdhi0_wp";
+			renesas,pins =
+				"PORT3", "PORT6", "PORT8", "PORT10", "PORT14",
+				"PORT17", "PORT18", "PORT23", "PORT24", "PORT25",
+				"PORT26", "PORT29", "PORT33", "PORT44", "PORT46",
+				"PORT47", "PORT72", "PORT73", "PORT74",
+				"PORT75", "PORT80", "PORT81", "PORT82",
+				"PORT83", "PORT86", "PORT87", "PORT88",
+				"PORT89", "PORT90", "PORT96", "PORT97",
+				"PORT102", "PORT103", "PORT104", "PORT105",
+				"PORT107", "PORT110", "PORT140", "PORT141",
+				"PORT142", "PORT198", "PORT199", "PORT275",
+				"PORT276", "PORT277", "PORT311", "PORT312";
+			bias-pull-down;
+		};
+	};
+
+	key_pins: keys {
+		renesas,pins = "PORT1", "PORT2";
+		bias-pull-up;
+	};
+
+	backlight_pin: backlight {
+		renesas,groups = "tpu0_to3";
+		renesas,function = "tpu0";
+	};
+
+	backlight_pin_hiz: backlight_hiz {
+		renesas,groups = "tpu0_to3";
+		bias-high-impedance;
+	};
+};
+
+&i2c2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	/* Proximity Sensor */
+	ltr501: ltr501@23 {
+		compatible = "bcm,ltr501";
+		reg = <0x23>;
+		gpio-irq-pin = <108>;
+		ps_contr = <0x00>;
+		ps_n_pusles = <0x32>;
+		prox_threshold_low = <65>;
+		prox_threshold_high = <70>;
+		prox_offset_param = <8>;
+		scale_factor = <4>;
+	};
+
+	/* Accelerometer sensor */
+	kxtik: kxtik@0e {
+		compatible = "bcm,kxtik";
+		/* slave address */
+		reg = <0x0e>;
+		min_interval = <5>;
+		poll_interval = <200>;
+		axis_map_x = <0>;
+		axis_map_y = <1>;
+		axis_map_z = <2>;
+		negate_x = <0>;
+		negate_y = <1>;
+		negate_z = <1>;
+		res_12bit = <64>;
+		g_range = <0>;
+	};
+
+	/* Magnetometer Sensor */
+	ak09911: ak09911@0c {
+		compatible = "akm, ak09911";
+		/* slave address */
+		reg = <0x0c>;
+	};
+};
+
+/* custom_t:CJ this is brcm path, dont remove it */
+&i2c3 {
+        lc709203f@0x0B {
+                compatible = "bcm,lc709203f";
+                reg = <0x0B>;
+                initial-rsoc = <0xAA55>;
+                appli-adjustment = <0x0024>;
+                change-of-param = <1>;
+                kernel-threshold-soc = <9>;
+                kernel-maximum-soc = <957>;
+                kernel-1stcharge-soc = <995>;
+                kernel-recharge-soc = <960>;
+                kernel-bakcharge-soc = <999>;
+        };
+        fan5405@0x6A {
+                compatible = "bcm,fan5405";
+                sense_r = <51>;
+        };
+};
+&i2c4 {
+	FocalTech-Ft5306@38 {
+		compatible = "bcm,FocalTech-Ft5306";
+		reg = <0x38>;
+		gpio-irq-pin = <30>;
+		gpio-reset-pin = <21>;
+		gpio-wakeup-pin = <21>;
+		x-max-value = <480>;
+		y-max-value = <800>;
+		use-irq = <1>;
+		power = "vtsp_3v";
+		auto_update_fw = <0>;
+		vkey_scope = "0x01:139:70:845:80:40:0x01:102:240:845:80:40:0x01:158:415:845:160:80\n";
+	};
+};
+
+&cmt17 {
+	renesas,linux-timer-type = "rtc";
+};

@@ -1,0 +1,7 @@
+# Connectivity
+
+config BCM_WLAN
+	tristate "WLAN host perf driver"
+	help
+		Broadcom's WLAN driver for interface
+		handling and performance

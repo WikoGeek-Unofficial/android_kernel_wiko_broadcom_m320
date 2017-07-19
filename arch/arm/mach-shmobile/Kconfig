@@ -1,0 +1,643 @@
+if ARCH_SHMOBILE
+
+comment "SH-Mobile System Type"
+
+config ARCH_SH7372
+	bool "SH-Mobile AP4 (SH7372)"
+	select ARCH_WANT_OPTIONAL_GPIOLIB
+	select ARM_CPU_SUSPEND if PM || CPU_IDLE
+	select CPU_V7
+	select SH_CLK_CPG
+
+config ARCH_SH73A0
+	bool "SH-Mobile AG5 (R8A73A00)"
+	select ARCH_WANT_OPTIONAL_GPIOLIB
+	select ARM_GIC
+	select CPU_V7
+	select I2C
+	select SH_CLK_CPG
+	select RENESAS_INTC_IRQPIN
+
+config ARCH_R8A73A4
+	bool "R-Mobile APE6 (R8A73A40)"
+	select ARCH_WANT_OPTIONAL_GPIOLIB
+	select ARM_GIC
+	select CPU_V7
+	select ARM_ARCH_TIMER
+	select SH_CLK_CPG
+	select RENESAS_IRQC
+
+config ARCH_R8A7740
+	bool "R-Mobile A1 (R8A77400)"
+	select ARCH_WANT_OPTIONAL_GPIOLIB
+	select ARM_GIC
+	select CPU_V7
+	select SH_CLK_CPG
+	select RENESAS_INTC_IRQPIN
+
+config ARCH_R8A7778
+	bool "R-Car M1 (R8A77780)"
+	select CPU_V7
+	select SH_CLK_CPG
+	select ARM_GIC
+
+config ARCH_R8A7779
+	bool "R-Car H1 (R8A77790)"
+	select ARCH_WANT_OPTIONAL_GPIOLIB
+	select ARM_GIC
+	select CPU_V7
+	select SH_CLK_CPG
+	select USB_ARCH_HAS_EHCI
+	select USB_ARCH_HAS_OHCI
+	select RENESAS_INTC_IRQPIN
+
+config ARCH_R8A7790
+	bool "R-Car H2 (R8A77900)"
+	select ARCH_WANT_OPTIONAL_GPIOLIB
+	select ARM_GIC
+	select CPU_V7
+	select ARM_ARCH_TIMER
+	select SH_CLK_CPG
+	select RENESAS_IRQC
+
+config ARCH_EMEV2
+	bool "Emma Mobile EV2"
+	select ARCH_WANT_OPTIONAL_GPIOLIB
+	select ARM_GIC
+	select CPU_V7
+
+config ARCH_R8A7373
+	bool "R-Mobile U2 (R8A7373)"
+	select CPU_V7
+	select SH_CLK_CPG
+	select ARCH_WANT_OPTIONAL_GPIOLIB
+	select ARM_GIC
+	select CLKSRC_MMIO
+	select HAVE_SCHED_CLOCK
+	select ARM_ERRATA_775420
+	select RENESAS_IRQC
+	select USE_OF
+	select CMA
+
+comment "SH-Mobile Board Type"
+
+config MACH_AP4EVB
+	bool "AP4EVB board"
+	depends on ARCH_SH7372
+	select ARCH_REQUIRE_GPIOLIB
+	select REGULATOR_FIXED_VOLTAGE if REGULATOR
+	select SH_LCD_MIPI_DSI
+	select SND_SOC_AK4642 if SND_SIMPLE_CARD
+
+choice
+	prompt "AP4EVB LCD panel selection"
+	default AP4EVB_QHD
+	depends on MACH_AP4EVB
+
+config AP4EVB_QHD
+	bool "MIPI-DSI QHD (960x540)"
+
+config AP4EVB_WVGA
+	bool "Parallel WVGA (800x480)"
+
+endchoice
+
+config MACH_AG5EVM
+	bool "AG5EVM board"
+	depends on ARCH_SH73A0
+	select ARCH_REQUIRE_GPIOLIB
+	select REGULATOR_FIXED_VOLTAGE if REGULATOR
+	select SH_LCD_MIPI_DSI
+
+config MACH_APE6EVM
+	bool "APE6EVM board"
+	depends on ARCH_R8A73A4
+	select USE_OF
+
+config MACH_MACKEREL
+	bool "mackerel board"
+	depends on ARCH_SH7372
+	select ARCH_REQUIRE_GPIOLIB
+	select REGULATOR_FIXED_VOLTAGE if REGULATOR
+	select SND_SOC_AK4642 if SND_SIMPLE_CARD
+	select USE_OF
+
+config MACH_KOTA2
+	bool "KOTA2 board"
+	depends on ARCH_SH73A0
+	select ARCH_REQUIRE_GPIOLIB
+	select REGULATOR_FIXED_VOLTAGE if REGULATOR
+
+config MACH_BONITO
+	bool "bonito board"
+	depends on ARCH_R8A7740
+	select ARCH_REQUIRE_GPIOLIB
+	select REGULATOR_FIXED_VOLTAGE if REGULATOR
+
+config MACH_ARMADILLO800EVA
+	bool "Armadillo-800 EVA board"
+	depends on ARCH_R8A7740
+	select ARCH_REQUIRE_GPIOLIB
+	select REGULATOR_FIXED_VOLTAGE if REGULATOR
+	select SND_SOC_WM8978 if SND_SIMPLE_CARD
+	select USE_OF
+
+config MACH_BOCKW
+	bool "BOCK-W platform"
+	depends on ARCH_R8A7778
+	select ARCH_REQUIRE_GPIOLIB
+	select RENESAS_INTC_IRQPIN
+	select USE_OF
+
+config MACH_MARZEN
+	bool "MARZEN board"
+	depends on ARCH_R8A7779
+	select ARCH_REQUIRE_GPIOLIB
+	select REGULATOR_FIXED_VOLTAGE if REGULATOR
+
+config MACH_MARZEN_REFERENCE
+	bool "MARZEN board - Reference Device Tree Implementation"
+	depends on ARCH_R8A7779
+	select ARCH_REQUIRE_GPIOLIB
+	select REGULATOR_FIXED_VOLTAGE if REGULATOR
+	select USE_OF
+	---help---
+	   Use reference implementation of Marzen board support
+	   which makes use of device tree at the expense
+	   of not supporting a number of devices.
+
+	   This is intended to aid developers
+
+config MACH_LAGER
+	bool "Lager board"
+	depends on ARCH_R8A7790
+	select USE_OF
+
+config MACH_KZM9D
+	bool "KZM9D board"
+	depends on ARCH_EMEV2
+	select REGULATOR_FIXED_VOLTAGE if REGULATOR
+	select USE_OF
+
+config MACH_KZM9G
+	bool "KZM-A9-GT board"
+	depends on ARCH_SH73A0
+	select ARCH_REQUIRE_GPIOLIB
+	select REGULATOR_FIXED_VOLTAGE if REGULATOR
+	select SND_SOC_AK4642 if SND_SIMPLE_CARD
+	select USE_OF
+
+config MACH_KZM9G_REFERENCE
+	bool "KZM-A9-GT board - Reference Device Tree Implementation"
+	depends on ARCH_SH73A0
+	select ARCH_REQUIRE_GPIOLIB
+	select REGULATOR_FIXED_VOLTAGE if REGULATOR
+	select SND_SOC_AK4642 if SND_SIMPLE_CARD
+	select USE_OF
+	---help---
+	   Use reference implementation of KZM-A9-GT board support
+	   which makes as greater use of device tree at the expense
+	   of not supporting a number of devices.
+
+	   This is intended to aid developers
+
+config MACH_HEATLTE
+        bool "HeatLTE board"
+        select ARCH_REQUIRE_GPIOLIB
+        depends on ARCH_R8A7373
+
+config MACH_VIVALTOLTE
+        bool "VivaltoLTE board"
+        select ARCH_REQUIRE_GPIOLIB
+        depends on ARCH_R8A7373
+
+config MACH_EOS
+	bool "eos2 common board support"
+	select ARCH_REQUIRE_GPIOLIB
+	depends on ARCH_R8A7373
+	help
+	  Select this to support eos2 boards.
+
+config MACH_AFYONLTE
+	bool "AfyonLTE board"
+	select ARCH_REQUIRE_GPIOLIB
+	depends on ARCH_R8A7373
+
+config MACH_U2USB
+	bool "U2USB board"
+	select ARCH_REQUIRE_GPIOLIB
+	depends on ARCH_R8A7373
+
+config U2_TIMERS
+	bool "U2 timers setup"
+	default n
+	help
+	 sets up the current timer, sched clock setup, clock event timers and clocksources.
+
+config U2_SDHI
+	bool "U2 sdhi setup implementation "
+	default n
+	help
+	 selects the sdhi setup implementation for u2 chipsets.
+
+config U2_TOUCHPANEL
+       bool "Touch panel setup for u2 based boards"
+       default n
+       help
+         Register required touchpanels for u2 boards
+
+config U2_STM_ETR_TO_SDRAM
+	bool "U2 STM ETR to SDRAM"
+	depends on ARCH_R8A7373
+	help
+	  R-Mobile-U2 STM Traces through ETR to SDRAM.
+
+comment "SH-Mobile System Configuration"
+
+config CPU_HAS_INTEVT
+        bool
+	default y
+
+menu "Memory configuration"
+
+config MEMORY_START
+	hex "Physical memory start address"
+	default "0x40000000" if MACH_AP4EVB || MACH_AG5EVM || \
+				MACH_MACKEREL || MACH_BONITO || \
+				MACH_ARMADILLO800EVA || MACH_APE6EVM || \
+				MACH_LAGER
+	default "0x41000000" if MACH_KOTA2
+	default "0x40000000" if MACH_EOS || MACH_AFYONLTE || \
+				 MACH_HEATLTE || MACH_VIVALTOLTE
+	default "0x00000000"
+	---help---
+	  Tweak this only when porting to a new machine which does not
+	  already have a defconfig. Changing it from the known correct
+	  value on any of the known systems will only lead to disaster.
+
+config MEMORY_SIZE
+	hex "Physical memory size"
+	default "0x80000000" if MACH_LAGER
+	default "0x40000000" if MACH_APE6EVM
+	default "0x40000000" if MACH_AG5EVM || MACH_BONITO || \
+				MACH_ARMADILLO800EVA 
+	default "0x1e000000" if MACH_KOTA2
+	default "0x10000000" if MACH_AP4EVB || MACH_MACKEREL
+	default "0x04000000"
+	help
+	  This sets the default memory size assumed by your kernel. It can
+	  be overridden as normal by the 'mem=' argument on the kernel command
+	  line.
+
+endmenu
+
+menu "Timer and clock configuration"
+
+config SHMOBILE_TIMER_HZ
+	int "Kernel HZ (jiffies per second)"
+	range 32 1024
+	default "128"
+	help
+	  Allows the configuration of the timer frequency. It is customary
+	  to have the timer interrupt run at 1000 Hz or 100 Hz, but in the
+	  case of low timer frequencies other values may be more suitable.
+	  SH-Mobile systems using a 32768 Hz RCLK for clock events may want
+	  to select a HZ value such as 128 that can evenly divide RCLK.
+	  A HZ value that does not divide evenly may cause timer drift.
+
+config SH_TIMER_CMT
+	bool "CMT timer driver"
+	help
+	  This enables build of the CMT timer driver.
+
+config SH_TIMER_CMT_ARM
+	bool "CMT timer driver dedicated for ARM CPU timer"
+	default y
+	help
+	  This enables build of the CMT timer driver.
+
+config EM_TIMER_STI
+	bool "STI timer driver"
+	default y
+	help
+	  This enables build of the STI timer driver.
+
+endmenu
+
+menu "CPU Frequency configuration"
+config ARCH_HAS_CPUFREQ
+	bool
+
+config CPUFREQ_SUPPORT
+	bool "Enable support for CPU srequency scaling"
+	select ARCH_HAS_CPUFREQ
+	help
+	  This enables support for CPU frequency scaling
+	  with R-Mobile U2 HW
+	  DFS is developed basing on CPUFreq framework of Linux kernel of Android OS.
+	  DFS is a feature offered to reduce power consumption
+	  by changing system clock dynamically (based on system load).
+	  When system load meets a specific condition,
+	  system clocks frequencies will be changed automatically.
+
+endmenu
+
+config SH_CLK_CPG
+	bool
+
+menu "Modem STM trace and debug configuration"
+
+config MUX_STM_TO_SDHI1
+	bool "Mux STM to SDHI1"
+	default y
+	help
+	  Mux STM CLK, DATA0-3, and SIDI to SDHI1 interface.
+
+endmenu
+
+menu "SH-Mobile TrustZone Configuration"
+config ARM_TZ
+	bool "ARM trustzone (TZ) Configuration."
+	default n
+	---help---
+	  ARM trustzone (TZ) Configuration.
+endmenu
+
+menu "SH-Mobile CPUFreq Setting"
+config SHMOBILE_CPUFREQ
+	bool "SH-Mobile has CPUFreq support"
+	select ARCH_HAS_CPUFREQ
+	default n
+
+config CPUFREQ_OVERDRIVE
+	bool "SH-Mobile CPUFreq overdrive"
+	depends on SHMOBILE_CPUFREQ
+	default n
+	help
+	  By default, maximum CPU frequency (Z clock) is 1.2 GHz only.
+	  When this config is enabled, max CPU frequency is 1.5 GHz
+	  instead of 1.2 GHz as normal. The frequency steps will also been
+	  adjusted when this config is enabled.
+
+config SH_TRANSITION_LATENCY
+	int "Transition Latency (ms)"
+	range 10 1000
+	default "50"
+	depends on SHMOBILE_CPUFREQ
+	help
+	  Transition latency between each sampling.
+
+config SH_UP_THRESHOLD
+	int "Up threshold (%)"
+	range 50 100
+	default "80"
+	depends on SHMOBILE_CPUFREQ
+	help
+	  Upper threshold.
+
+config SH_DOWN_THRESHOLD
+	int "Down threshold (%)"
+	range 10 50
+	default "20"
+	depends on SHMOBILE_CPUFREQ
+	help
+	  Lower threshold.
+
+config SH_FRQ_STEP
+	int "Transition frequency step (%)"
+	range 1 100
+	default "15"
+	depends on SHMOBILE_CPUFREQ
+	help
+	  Frequency Step.
+
+config SH_SAMPLING_DOWN_FACTOR
+	int "Sampling Down Factor"
+	range 1 20
+	default "5"
+	depends on SHMOBILE_CPUFREQ
+	help
+	  Multiplier of transition latency.
+
+endmenu
+
+config PDC
+	bool "Power Domain Control"
+	default n
+	depends on PM_RUNTIME
+	help
+	  This enables build of PDC driver.
+
+config PM_HAS_SECURE
+	default y
+	bool "Support Secure OS by Power Management"
+	depends on ARM_SEC_HAL
+	help
+	  This enables PM support for Secure OS.
+
+config HOTPLUG_ARCH_R8A7373
+	default y
+	bool "Support CPU Hotplug for R-MobileU2"
+	depends on HOTPLUG_CPU
+	help
+	  This CPU Hotplug for R-MobileU2 LSI generic power saving
+	  Non-boot CPU(s) can ON/OFF with this fuction
+	  The implementation is specific for R-MobileU2
+	  It can support hotplug non-boot CPU in active state, Idle and Suspend
+
+config HOTPLUG_CPU_MGR
+	default y
+	bool "Support CPU Hotplug Manager for R-MobileU2 New power consumption"
+	depends on HOTPLUG_CPU
+	depends on HOTPLUG_ARCH_R8A7373
+	help
+	  This CPU Hotplug Manager for R-MobileU2 New power consumption
+	  It relatd to 3 modules: Dynamic Frequency Scaling (DFS), Hotplug
+	  and Sleep (WFI)/CoreStandy)
+
+config PM_BOOT_SYSFS
+	default y
+	bool "Support Restrain DVFS at the time of start by Power Management"
+	help
+	  This enables build for Power Management
+	  It created new file which controls the operation of Dynamic Frequency
+	  Scaling (DFS) and Sleep (WFI)/CoreStandy) during boot time
+
+config U2_SYS_CPU_DORMANT_MODE
+	default y
+	depends on CPU_IDLE
+	bool "Enable ARM dormant mode support for U2 ARCH"
+	help
+	 Select y to enable ARM CPU dormant mode (shutdown)
+	 during linux cpuidle and suspend.
+	 if you select N, ARM CPU shutdown will be disabled
+	 in CPUIDLE call and suspend call. ARM CPU will enter
+	 only WFI state
+
+config U2_SYS_CPU_WFI_LOWFREQ
+	default n
+	depends on CPU_IDLE
+	bool "Enabled ARM WFI low frequency idle state"
+	help
+	 Select y to enable ARM WFI low frequency idle state.
+	 In this state, ARM clock source is switch to 26MHz XTAL
+	 source while entering WFI state to save power
+
+config	PM_FORCE_SLEEP
+	default y
+	bool "Force sleep feature required by AT+SYSSLEEP"
+	depends on ARCH_SHMOBILE
+	depends on SUSPEND
+	depends on ARCH_R8A7373
+	help
+	 This enables custom force sleep implementation in kernel required
+	 by AT+SYSSLEEP command. This feature provides a custom sysfs interface
+	 to user space (/sys/module/suspend/paramters/pm_force_sleep). if '3'
+	 is written to this interface, it enables a special flag (force_sleep)
+	 which ensure that system enters into suspend successfully (no backout
+	 by DPM) and put the device to deep sleep and disable all the interrupts
+
+source "drivers/sh/Kconfig"
+
+config RENESAS
+	bool "Renesas reference implementations"
+	default n
+
+config RENESAS_BT
+	bool "Renesas reference implementation for BT"
+	default n
+	depends on RENESAS
+
+config RENESAS_NFC
+	bool "Renesas reference implementation for NFC"
+	default n
+	depends on RENESAS
+
+config RENESAS_GPS
+	bool "Renesas reference implementation for GPS"
+	default n
+	depends on RENESAS
+config BRCM_UNIFIED_DHD_SUPPORT
+	bool "Renesas reference implementation for WiFi"
+	default n
+config RENESAS_WIFI
+	bool "Renesas reference implementation for WiFi"
+	default n
+	depends on BRCM_UNIFIED_DHD_SUPPORT
+
+comment "Debugging Feature"
+
+#
+# GPS devices
+#
+config GPS_CSR_GSD5T
+	bool "CSR_GSD5T_CHIPSET"
+	default n
+
+config GPS_BCM4752
+	bool "BROADCOM_BCM4752_CHIPSET"
+	default n
+
+if BT
+config BT_CSR8811
+	bool "Enable CSR8811 driver"
+	default n
+
+config BT_BCM4330
+	bool "Enable BCM4330 driver"
+	default y
+
+config BT_BCM4334
+	bool "Enable BCM4334 driver"
+	default y
+	help
+	  Adds BCM4334 RFKILL driver for Broadcom BCM4334 chipset
+
+config BCM4334_BT
+	bool "Enable BCM4334 driver on Renesas Baseband"
+	default y
+	help
+	  Adds BCM4334 RFKILL driver for Broadcom BCM4334 chipset
+
+config BCM4330_MODULE
+	bool "Enable BCM4330 driver on Renesas Baseband"
+	default y
+
+config BT_BCM43241
+	bool "Enable BCM43241 driver"
+	default n
+	help
+	  Adds BCM43241 RFKILL driver for Broadcom BCM4334 chipset
+
+config BT_MGMT
+	bool "Bluetooth Mgmt"
+	default n
+	help
+	  This is for bluetooth mgmt
+endif
+
+config SAMSUNG_SENSOR
+	bool "Enable Samsung Sensor Driver"
+	default n
+	---help---
+	  support Samsung Sensor Driver
+
+config FLASH_MIC2871
+	bool "Enable MIC2871 driver"
+	default n
+	---help---
+ 	    Adds MIC2871 LED Flash driver
+
+config FLASH_RT8547
+        bool "Enable RT8547 driver"
+        default n
+        ---help---
+            Adds RT8547 LED Flash driver
+		It enables Flash
+		Support for Flash Driver
+
+source "arch/arm/mach-shmobile/ramdefrag/Kconfig"
+
+config SHMOBILE_PASR_SUPPORT
+	default n
+	bool "Support Partial Array Self Refresh"
+	depends on SHMOBILE_RAM_DEFRAG
+	help
+	  This enables PASR support
+	  It is called by Suspend module before entering suspend state
+
+config SH_RAMDUMP
+	default y
+	bool "Support for Ramdump"
+	depends on ARCH_R8A7373
+	depends on KEXEC
+	help
+	  This enables ramdump feature. It will flush caches from oops,panic
+	  and emerg kmsg callback. It will also save exceptio, core&mmu and
+	  some hw registers to ram.
+
+config SH_RAMDUMP_DEBUG_ANDROID_BOOT_FREEZE
+	int "Android boot time (s)"
+	range 0 1000
+	default "135"
+	depends on SH_RAMDUMP
+	help
+	  This will generate ramdump if android boot has not completed before 
+	  this time. 0 will disable. Please note the 1st boot usually takes
+	  the longest time (due to Android .APK installations).
+
+config SEC_THERMISTOR
+	bool "Use external thermistor with ADC"
+	default n
+	help
+	  Use thermistor driver to check system temperature
+
+config SEC_COMMON
+	default n
+	bool "sec_class support"
+	help
+	  This enables a common sec_class device support share by a lot of
+	  touch & input related devices.
+
+# endif for ARCH_SHMOBILE
+endif

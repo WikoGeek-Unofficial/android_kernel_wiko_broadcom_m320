@@ -1,0 +1,9 @@
+config POWERVR_SGX
+	tristate "PowerVR SGX"
+	depends on ARCH_SHMOBILE
+	default y
+	help
+	  Driver for PowerVR SGX hardware.
+
+	  Say Y here if your SoC contains a PowerVR SGX GPU. For more
+	  information, see <http://www.imgtec.com/powervr/>.
